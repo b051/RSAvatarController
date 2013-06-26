@@ -7,7 +7,7 @@
 #import "RSMoveAndScaleController.h"
 #import "UIImage+WithShadow.h"
 
-#define PANEL_HEIGHT 96 
+#define PANEL_HEIGHT 96
 
 @implementation UIView (snapshot)
 
@@ -32,8 +32,6 @@
 	UIImageView *imageView;
 }
 
-@synthesize delegate, originImage, destinationSize;
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -53,6 +51,7 @@
 	scrollview.minimumZoomScale = 1.0;
 	scrollview.maximumZoomScale = 2.0;
 	[scrollview addSubview:imageView];
+	[self.view addSubview:self.overlayView];
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
@@ -86,9 +85,9 @@
 {
 	[self.navigationController setNavigationBarHidden:YES];
 	[super viewWillAppear:animated];
-	imageView.image = originImage;
-	CGFloat height = 320 / originImage.size.width  * originImage.size.height;
-	originImage = nil;
+	imageView.image = _originImage;
+	CGFloat height = 320 / _originImage.size.width  * _originImage.size.height;
+	_originImage = nil;
 	UIScrollView *scrollview = (UIScrollView *)imageView.superview;
 	imageView.frame = CGRectMake(0, 0, 320, height);
 	scrollview.contentSize = imageView.bounds.size;

@@ -101,6 +101,7 @@
 	RSMoveAndScaleController *moveAndScale = [[RSMoveAndScaleController alloc] init];
 	moveAndScale.originImage = originImage;
 	moveAndScale.destinationSize = [self.delegate destImageSize];
+	moveAndScale.overlayView = [self.delegate overlayForMoveAndScale:moveAndScale];
 	moveAndScale.delegate = self;
 	[picker pushViewController:moveAndScale animated:NO];
 }

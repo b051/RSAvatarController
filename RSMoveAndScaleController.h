@@ -5,6 +5,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "RSAvatarController.h"
 
 @class RSMoveAndScaleController;
 
@@ -15,14 +16,11 @@
 
 @end
 
-
-@interface RSMoveAndScaleController : UIViewController <UIScrollViewDelegate>
+@interface RSMoveAndScaleController : UIViewController <RSMoveAndScaleTrait, UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIImage *originImage;
-@property (nonatomic) CGSize destinationSize;
 @property (nonatomic, strong) UIView *overlayView;
-@property (nonatomic, unsafe_unretained) id<RSMoveAndScaleControllerDelegate> delegate;
-- (void)cancel;
-- (void)choose;
+@property (nonatomic) CGSize destinationSize;
+@property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
 
 @end
