@@ -114,7 +114,7 @@
 
 - (void)moveAndScaleControllerDidCancel:(RSMoveAndScaleController *)moveAndScale
 {
-	[self imagePickerControllerDidCancel:nil];
+	[self imagePickerControllerDidCancel:_imagePicker];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker

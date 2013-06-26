@@ -37,6 +37,8 @@
     [super viewDidLoad];
 	self.wantsFullScreenLayout = NO;
 	self.contentSizeForViewInPopover = CGSizeMake(320, 443);
+	[self.view addSubview:self.overlayView];
+
 	CGRect scrollFrame = UIEdgeInsetsInsetRect(self.view.bounds, UIEdgeInsetsMake(PANEL_HEIGHT, 0, PANEL_HEIGHT, 0));
 	UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:scrollFrame];
 	scrollview.showsVerticalScrollIndicator = NO;
@@ -51,7 +53,6 @@
 	scrollview.minimumZoomScale = 1.0;
 	scrollview.maximumZoomScale = 2.0;
 	[scrollview addSubview:imageView];
-	[self.view addSubview:self.overlayView];
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
