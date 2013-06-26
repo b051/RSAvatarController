@@ -15,6 +15,7 @@
 {
 	UIPopoverController *popover;
 	__weak UIViewController *parentController;
+	UIActionSheet *_actionSheet;
 }
 
 - (BOOL)takingAvatar
@@ -30,14 +31,13 @@
 - (void)openActionSheetInController:(UIViewController *)viewController withSheetStyle:(UIActionSheetStyle)sheetStyle
 {
 	parentController = viewController;
-	UIActionSheet *actionSheet = nil;
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-		actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Select from Gallery", nil];
+		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Select from Gallery", nil];
 	} else {
-		actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Select from Gallery", nil];
+		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Select from Gallery", nil];
 	}
-	actionSheet.actionSheetStyle = sheetStyle;
-	[actionSheet showInView:viewController.view];
+	_actionSheet.actionSheetStyle = sheetStyle;
+	[_actionSheet showInView:viewController.view];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -109,7 +109,7 @@
 - (void)moveAndScaleController:(RSMoveAndScaleController *)moveAndScale didFinishCropping:(UIImage *)destImage
 {
 	[self.delegate pickerController:_imagePicker pickedAvatar:destImage];
-	[self imagePickerControllerDidCancel:nil];
+	[self imagePickerControllerDidCancel:_imagePicker];
 }
 
 - (void)moveAndScaleControllerDidCancel:(RSMoveAndScaleController *)moveAndScale
@@ -123,7 +123,7 @@
 		[popover dismissPopoverAnimated:YES];
 		popover = nil;
 	} else {
-		[picker dismissViewControllerAnimated:YES completion:^{
+		[picker.presentingViewController dismissViewControllerAnimated:YES completion:^{
 			_imagePicker = nil;
 		}];
 	}
