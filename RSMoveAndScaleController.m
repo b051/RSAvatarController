@@ -40,12 +40,16 @@
 	[self.view addSubview:self.overlayView];
 
 	CGRect scrollFrame = UIEdgeInsetsInsetRect(self.view.bounds, UIEdgeInsetsMake(PANEL_HEIGHT, 0, PANEL_HEIGHT, 0));
-	UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:scrollFrame];
+	UIView *borderView = [[UIView alloc] initWithFrame:scrollFrame];
+	borderView.clipsToBounds = YES;
+	[self.view addSubview:borderView];
+	
+	UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:borderView.bounds];
 	scrollview.showsVerticalScrollIndicator = NO;
 	scrollview.showsHorizontalScrollIndicator = NO;
 	scrollview.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	scrollview.delegate = self;
-	[self.view addSubview:scrollview];
+	[borderView addSubview:scrollview];
 	imageView = [[UIImageView alloc] init];
 	imageView.contentMode = UIViewContentModeScaleAspectFit;
 	scrollview.zoomScale = 1.0;
