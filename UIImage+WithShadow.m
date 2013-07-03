@@ -8,7 +8,7 @@
 	CGColorSpaceRef colourSpace = CGColorSpaceCreateDeviceRGB();
 	CGSize size = CGSizeMake(self.size.width * self.scale, self.size.height * self.scale);
 	CGRect rect = CGRectMake(0, 0, size.width, size.height);
-	CGContextRef context = CGBitmapContextCreate(NULL, size.width, size.height, CGImageGetBitsPerComponent(self.CGImage), 0, colourSpace, kCGImageAlphaPremultipliedLast);
+	CGContextRef context = CGBitmapContextCreate(NULL, size.width, size.height, CGImageGetBitsPerComponent(self.CGImage), 0, colourSpace, (CGBitmapInfo) kCGImageAlphaPremultipliedLast);
 	CGColorSpaceRelease(colourSpace);
 	
 	block(context, rect);
@@ -126,7 +126,7 @@
 	CGFloat targetWidth = sourceImage.size.width * ratio * scale;
 	CGFloat targetHeight = sourceImage.size.height * ratio * scale;
 //	NSLog(@"%f x %f", targetWidth, targetHeight);
-	CGContextRef bitmap = CGBitmapContextCreate(NULL, targetWidth, targetHeight, CGImageGetBitsPerComponent(imageRef), 0, colorSpaceInfo, kCGImageAlphaPremultipliedFirst);
+	CGContextRef bitmap = CGBitmapContextCreate(NULL, targetWidth, targetHeight, CGImageGetBitsPerComponent(imageRef), 0, colorSpaceInfo, (CGBitmapInfo) kCGImageAlphaPremultipliedFirst);
 	CGColorSpaceRelease(colorSpaceInfo);
 	if (sourceImage.imageOrientation != UIImageOrientationUp && sourceImage.imageOrientation != UIImageOrientationDown) {
 		CGFloat i = targetHeight;
