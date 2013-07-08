@@ -20,7 +20,7 @@
 	return image;
 }
 
-- (UIImage*) maskWithMask:(UIImage *)maskImage
+- (UIImage*)maskWithMask:(UIImage *)maskImage
 {
 	CGImageRef maskRef = maskImage.CGImage; 
 	
@@ -158,31 +158,6 @@
 	
 	return image; 
 }
-//
-//- (UIImage *)resizedImage:(CGFloat)ratio interpolationQuality:(CGInterpolationQuality)quality orientation:(UIImageOrientation)orientation
-//{
-//	CGFloat scale = [UIScreen mainScreen].scale;
-//	CGColorSpaceRef colourSpace = CGColorSpaceCreateDeviceRGB();
-//	CGSize size = CGSizeMake(self.size.width * scale * ratio, self.size.height * scale * ratio);
-//	
-//	CGContextRef context = CGBitmapContextCreate(NULL, size.width, size.height, CGImageGetBitsPerComponent(self.CGImage), 0, colourSpace, kCGImageAlphaPremultipliedLast);
-//	CGColorSpaceRelease(colourSpace);
-//	
-//	CGContextSetInterpolationQuality(context, quality);
-//    
-//    // Draw into the context; this scales the image
-//    CGContextDrawImage(context, (CGRect){.size = size}, self.CGImage);
-////	if (watermark) {
-////		CGSize frontSize = CGSizeMake(watermark.size.width, watermark.size.height);
-////		CGContextDrawImage(context, CGRectMake((size.width - frontSize.width) / 2, (size.height - frontSize.height) / 2, frontSize.width, frontSize.height), watermark.CGImage);
-////    }
-//	
-//	CGImageRef cgImage = CGBitmapContextCreateImage(context);
-//    CGContextRelease(context);
-//    UIImage *image = [UIImage imageWithCGImage:cgImage scale:scale orientation:orientation];
-//    CGImageRelease(cgImage);
-//	return image;
-//}
 
 - (UIImage *)blendMode:(CGBlendMode)blendMode color:(CGColorRef)color reverse:(BOOL)reverse
 {
