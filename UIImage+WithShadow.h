@@ -1,4 +1,3 @@
-
 #import <UIKit/UIKit.h>
 
 @interface UIImage (WithShadow)
@@ -11,5 +10,6 @@
 - (UIImage *)wrap:(UIImage *)newImage;
 - (UIImage *)resizedImageFitSize:(CGSize)frameSize;
 - (UIImage *)resizedImage:(CGFloat)ratio;
+- (UIImage *)clippingMask:(CGColorRef)clippingMask;
 
 @end
