@@ -41,8 +41,15 @@
 - (UIImage *)clippingMask:(CGColorRef)clippingMask
 {
 	return [self operateOn:^(CGContextRef context, CGRect rect) {
-		//		CGContextDrawImage(context, rect, self.CGImage);
-		CGContextClipToMask(context, rect, self.CGImage);
+		CGImageRef image = self.CGImage;
+		CGImageRef mask = CGImageMaskCreate(CGImageGetWidth(image),
+											CGImageGetHeight(image),
+											CGImageGetBitsPerComponent(image),
+											CGImageGetBitsPerPixel(image),
+											CGImageGetBytesPerRow(image),
+											CGImageGetDataProvider(image), NULL, YES);
+		CGContextClipToMask(context, rect, mask);
+		CGImageRelease(mask);
 		CGContextSetFillColorWithColor(context, clippingMask);
 		CGContextFillRect(context, rect);
 	}];
