@@ -30,6 +30,7 @@
 @implementation RSMoveAndScaleController
 {
 	UIImageView *imageView;
+	UIView *borderView;
 }
 
 - (void)viewDidLoad
@@ -37,10 +38,10 @@
     [super viewDidLoad];
 	self.wantsFullScreenLayout = NO;
 	self.contentSizeForViewInPopover = CGSizeMake(320, 443);
+	self.overlayView.frame = self.view.bounds;
 	[self.view addSubview:self.overlayView];
-
-	CGRect scrollFrame = UIEdgeInsetsInsetRect(self.view.bounds, UIEdgeInsetsMake(PANEL_HEIGHT, 0, PANEL_HEIGHT, 0));
-	UIView *borderView = [[UIView alloc] initWithFrame:scrollFrame];
+	
+	borderView = [[UIView alloc] initWithFrame:self.scrollFrame];
 	borderView.clipsToBounds = YES;
 	[self.view addSubview:borderView];
 	
@@ -69,6 +70,22 @@
 	[self.delegate moveAndScaleControllerDidCancel:self];
 }
 
+- (CGRect)scrollFrame
+{
+	CGSize size = self.view.bounds.size;
+	CGFloat x = (size.width - _destinationSize.width) / 2;
+	CGFloat y = x * 1.5;
+	return CGRectMake(x, y, _destinationSize.width, _destinationSize.height);
+}
+
+- (void)setDestinationSize:(CGSize)destinationSize
+{
+	_destinationSize = destinationSize;
+	if (self.isViewLoaded) {
+		borderView.frame = self.scrollFrame;
+	}
+}
+
 - (void)choose
 {
 	CGRect scrollFrame = imageView.superview.frame;
@@ -77,10 +94,7 @@
 	CGFloat y_2 = (scrollFrame.size.height - min) / 2;
 	UIImage *snapshot = [imageView.superview RS_snapshot:UIEdgeInsetsMake(y_2, x_2, y_2, x_2)];
 	
-	if (self.destinationSize.width > 2) {
-		if (snapshot.scale > 1) {
-			self.destinationSize = CGSizeMake(self.destinationSize.width / snapshot.scale, self.destinationSize.height / snapshot.scale);
-		}
+	if (self.destinationSize.width > 0 && self.destinationSize.height > 0) {
 		snapshot = [snapshot resizedImageFitSize:self.destinationSize];
 	}
 	[self.delegate moveAndScaleController:self didFinishCropping:snapshot];
@@ -96,7 +110,7 @@
 	UIScrollView *scrollview = (UIScrollView *)imageView.superview;
 	imageView.frame = CGRectMake(0, 0, 320, height);
 	scrollview.contentSize = imageView.bounds.size;
-
+	
 	CGRect defaultVisible = scrollview.bounds;
 	defaultVisible.origin.y = (height - scrollview.bounds.size.height) / 2;
 	[scrollview scrollRectToVisible:defaultVisible animated:NO];
