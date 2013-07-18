@@ -21,6 +21,7 @@
 @property (nonatomic, strong) UIImage *originImage;
 @property (nonatomic, strong) UIView *overlayView;
 @property (nonatomic) CGSize destinationSize;
+@property (nonatomic, strong) UIColor *foregroundColor;
 @property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
 
 @end

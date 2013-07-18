@@ -30,7 +30,8 @@
 @implementation RSMoveAndScaleController
 {
 	UIImageView *imageView;
-	UIView *borderView;
+	CALayer *scrollLayer;
+	UIScrollView *scrollview;
 }
 
 - (void)viewDidLoad
@@ -38,24 +39,46 @@
     [super viewDidLoad];
 	self.wantsFullScreenLayout = NO;
 	self.contentSizeForViewInPopover = CGSizeMake(320, 443);
-	self.overlayView.frame = self.view.bounds;
+	CGRect frame = self.overlayView.frame;
+	CGSize size = self.view.bounds.size;
+	CGFloat bottomHeight = 96;
+	if (frame.size.height < size.height) {
+		NSUInteger mask = self.overlayView.autoresizingMask;
+		if ((mask | UIViewAutoresizingFlexibleTopMargin) == mask) {
+			frame.origin.y = size.height - frame.size.height;
+			bottomHeight = frame.size.height;
+		}
+		self.overlayView.frame = frame;
+	} else {
+		self.overlayView.frame = self.view.bounds;
+	}
 	[self.view addSubview:self.overlayView];
+	CGRect mainFrame = CGRectMake(0, 0, size.width, size.height - bottomHeight);
+	UIScrollView *clippingView = [[UIScrollView alloc] initWithFrame:mainFrame];
+	clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+	[self.view addSubview:clippingView];
+	CALayer *mask = [CALayer layer];
+	mask.frame = mainFrame;
+	mask.backgroundColor = (self.foregroundColor ?: [UIColor blackColor]).CGColor;
+	scrollLayer = [CALayer layer];
+	scrollLayer.frame = self.scrollFrame;
+	scrollLayer.backgroundColor = [UIColor whiteColor].CGColor;
+	[mask addSublayer:scrollLayer];
+	clippingView.layer.mask = mask;
+	clippingView.clipsToBounds = YES;
+	self.view.backgroundColor = self.foregroundColor;
 	
-	borderView = [[UIView alloc] initWithFrame:self.scrollFrame];
-	borderView.clipsToBounds = YES;
-	[self.view addSubview:borderView];
-	
-	UIScrollView *scrollview = [[UIScrollView alloc] initWithFrame:borderView.bounds];
+	scrollview = [[UIScrollView alloc] initWithFrame:scrollLayer.frame];
 	scrollview.showsVerticalScrollIndicator = NO;
 	scrollview.showsHorizontalScrollIndicator = NO;
 	scrollview.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	scrollview.delegate = self;
-	[borderView addSubview:scrollview];
+	[clippingView addSubview:scrollview];
 	imageView = [[UIImageView alloc] init];
 	imageView.contentMode = UIViewContentModeScaleAspectFit;
 	scrollview.zoomScale = 1.0;
 	scrollview.clipsToBounds = NO;
-	scrollview.minimumZoomScale = 1.0;
+	scrollview.minimumZoomScale = 0.5;
 	scrollview.maximumZoomScale = 2.0;
 	[scrollview addSubview:imageView];
 }
@@ -63,6 +86,14 @@
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
 	return imageView;
+}
+
+- (void)setDestinationSize:(CGSize)destinationSize
+{
+	_destinationSize = destinationSize;
+	if (self.isViewLoaded) {
+		scrollLayer.frame = scrollview.frame = self.scrollFrame;
+	}
 }
 
 - (void)cancel
@@ -76,14 +107,6 @@
 	CGFloat x = (size.width - _destinationSize.width) / 2;
 	CGFloat y = x * 1.5;
 	return CGRectMake(x, y, _destinationSize.width, _destinationSize.height);
-}
-
-- (void)setDestinationSize:(CGSize)destinationSize
-{
-	_destinationSize = destinationSize;
-	if (self.isViewLoaded) {
-		borderView.frame = self.scrollFrame;
-	}
 }
 
 - (void)choose
@@ -102,17 +125,17 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	[self.navigationController setNavigationBarHidden:YES];
 	[super viewWillAppear:animated];
 	imageView.image = _originImage;
-	CGFloat height = 320 / _originImage.size.width  * _originImage.size.height;
+	CGFloat width = self.view.bounds.size.width;
+	CGFloat height = width / _originImage.size.width  * _originImage.size.height;
 	_originImage = nil;
-	UIScrollView *scrollview = (UIScrollView *)imageView.superview;
-	imageView.frame = CGRectMake(0, 0, 320, height);
+	imageView.frame = CGRectMake(0, 0, width, height);
 	scrollview.contentSize = imageView.bounds.size;
 	
 	CGRect defaultVisible = scrollview.bounds;
 	defaultVisible.origin.y = (height - scrollview.bounds.size.height) / 2;
+	defaultVisible.origin.x = (width - scrollview.bounds.size.height) / 2;
 	[scrollview scrollRectToVisible:defaultVisible animated:NO];
 }
 
