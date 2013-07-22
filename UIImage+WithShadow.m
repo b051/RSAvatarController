@@ -160,7 +160,8 @@
 		CGContextTranslateCTM (bitmap, 0 - insets.left * scale, -targetHeight - insets.top * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationRight) {
 		CGContextRotateCTM (bitmap, -M_PI / 2);
-		CGContextTranslateCTM (bitmap, - targetWidth + insets.top * scale, - insets.left * scale);
+		//bottom, left
+		CGContextTranslateCTM (bitmap, - targetWidth + insets.bottom * scale, -insets.left * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationUp) {
 		CGContextTranslateCTM (bitmap, -insets.left * scale, -insets.top * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationDown) {
