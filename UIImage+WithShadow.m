@@ -106,23 +106,35 @@
 	}];
 }
 
-- (UIImage *)resizedImageFitSize:(CGSize)frameSize
+- (UIImage *)resizedImageFitSize:(CGSize)frameSize edgeInsets:(UIEdgeInsets)insets
 {
 	CGSize imageSize = self.size;
 	CGFloat ratio = 1;
-	CGFloat frameRatio = frameSize.width / frameSize.height;
-	CGFloat imageRatio = imageSize.width / imageSize.height;
-	if (imageRatio > frameRatio) {
-		frameSize.height = frameSize.width / imageRatio;
-	} else {
-		frameSize.width = frameSize.height * imageRatio;
+	CGFloat targetHeight = imageSize.height, targetWidth = imageSize.width;
+	CGFloat height = frameSize.height, width = frameSize.width;
+	height += insets.top + insets.bottom;
+	width += insets.left + insets.right;
+	
+	CGFloat frameRatio = width / height;
+	CGFloat imageRatio = targetHeight / targetWidth;
+	if (imageRatio < frameRatio) {
+		width = height * imageRatio;
 	}
-	ratio = frameSize.width / imageSize.width;
-	UIImage *image = [self resizedImage:ratio];
-	return image;
+	ratio = width / targetWidth;
+	return [self resizedImage:ratio edgeInsets:insets];
+}
+
+- (UIImage *)resizedImageFitSize:(CGSize)frameSize
+{
+	return [self resizedImageFitSize:frameSize edgeInsets:UIEdgeInsetsZero];
 }
 
 - (UIImage *)resizedImage:(CGFloat)ratio
+{
+	return [self resizedImage:ratio edgeInsets:UIEdgeInsetsZero];
+}
+
+- (UIImage *)resizedImage:(CGFloat)ratio edgeInsets:(UIEdgeInsets)insets
 {
 	CGFloat scale = [UIScreen mainScreen].scale;
 	UIImage* sourceImage = self; 
@@ -130,10 +142,10 @@
 	CGImageRef imageRef = [sourceImage CGImage];
 	CGColorSpaceRef colorSpaceInfo = CGColorSpaceCreateDeviceRGB();
 	
-	CGFloat targetWidth = sourceImage.size.width * ratio * scale;
-	CGFloat targetHeight = sourceImage.size.height * ratio * scale;
+	CGFloat targetWidth = (sourceImage.size.width * ratio) * scale;
+	CGFloat targetHeight = (sourceImage.size.height * ratio) * scale;
 //	NSLog(@"%f x %f", targetWidth, targetHeight);
-	CGContextRef bitmap = CGBitmapContextCreate(NULL, targetWidth, targetHeight, CGImageGetBitsPerComponent(imageRef), 0, colorSpaceInfo, (CGBitmapInfo) kCGImageAlphaPremultipliedFirst);
+	CGContextRef bitmap = CGBitmapContextCreate(NULL, targetWidth - (insets.left + insets.right) * scale, targetHeight - (insets.top + insets.bottom) * scale, CGImageGetBitsPerComponent(imageRef), 0, colorSpaceInfo, (CGBitmapInfo) kCGImageAlphaPremultipliedFirst);
 	CGColorSpaceRelease(colorSpaceInfo);
 	if (sourceImage.imageOrientation != UIImageOrientationUp && sourceImage.imageOrientation != UIImageOrientationDown) {
 		CGFloat i = targetHeight;
@@ -145,21 +157,21 @@
 	
 	if (sourceImage.imageOrientation == UIImageOrientationLeft) {
 		CGContextRotateCTM (bitmap, M_PI / 2);
-		CGContextTranslateCTM (bitmap, 0, -targetHeight);
+		CGContextTranslateCTM (bitmap, 0 - insets.left * scale, -targetHeight - insets.top * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationRight) {
 		CGContextRotateCTM (bitmap, -M_PI / 2);
-		CGContextTranslateCTM (bitmap, -targetWidth, 0);
-		
+		CGContextTranslateCTM (bitmap, - targetWidth + insets.top * scale, - insets.left * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationUp) {
-		// NOTHING
+		CGContextTranslateCTM (bitmap, -insets.left * scale, -insets.top * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationDown) {
-		CGContextTranslateCTM (bitmap, targetWidth, targetHeight);
+		CGContextTranslateCTM (bitmap, targetWidth - insets.left * scale, targetHeight - insets.top * scale);
 		CGContextRotateCTM (bitmap, -M_PI);
 	}
 	
 	CGContextDrawImage(bitmap, CGRectMake(0, 0, targetWidth, targetHeight), imageRef);
 	CGImageRef ref = CGBitmapContextCreateImage(bitmap);
 	UIImage *image = [UIImage imageWithCGImage:ref scale:scale orientation:UIImageOrientationUp];
+
 	CGContextRelease(bitmap);
 	CGImageRelease(ref);
 	

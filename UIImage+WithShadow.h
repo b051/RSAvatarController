@@ -9,7 +9,9 @@
 - (UIImage *)blendMode:(CGBlendMode)blendMode color:(CGColorRef)color reverse:(BOOL)reverse;
 - (UIImage *)wrap:(UIImage *)newImage;
 - (UIImage *)resizedImageFitSize:(CGSize)frameSize;
+- (UIImage *)resizedImageFitSize:(CGSize)frameSize edgeInsets:(UIEdgeInsets)insets;
 - (UIImage *)resizedImage:(CGFloat)ratio;
+- (UIImage *)resizedImage:(CGFloat)ratio edgeInsets:(UIEdgeInsets)insets;
 - (UIImage *)clippingMask:(CGColorRef)clippingMask;
 
 @end
