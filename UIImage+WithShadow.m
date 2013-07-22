@@ -111,16 +111,21 @@
 	CGSize imageSize = self.size;
 	CGFloat ratio = 1;
 	CGFloat targetHeight = imageSize.height, targetWidth = imageSize.width;
+	if (self.imageOrientation != UIImageOrientationUp && self.imageOrientation != UIImageOrientationDown) {
+		CGFloat i = targetHeight;
+		targetHeight = targetWidth;
+		targetWidth = i;
+	}
 	CGFloat height = frameSize.height, width = frameSize.width;
 	height += insets.top + insets.bottom;
 	width += insets.left + insets.right;
 	
 	CGFloat frameRatio = width / height;
-	CGFloat imageRatio = targetHeight / targetWidth;
+	CGFloat imageRatio = targetWidth / targetHeight;
 	if (imageRatio < frameRatio) {
 		width = height * imageRatio;
 	}
-	ratio = width / targetWidth;
+	ratio = width / targetHeight;
 	return [self resizedImage:ratio edgeInsets:insets];
 }
 
@@ -145,27 +150,34 @@
 	CGFloat targetWidth = (sourceImage.size.width * ratio) * scale;
 	CGFloat targetHeight = (sourceImage.size.height * ratio) * scale;
 //	NSLog(@"%f x %f", targetWidth, targetHeight);
-	CGContextRef bitmap = CGBitmapContextCreate(NULL, targetWidth - (insets.left + insets.right) * scale, targetHeight - (insets.top + insets.bottom) * scale, CGImageGetBitsPerComponent(imageRef), 0, colorSpaceInfo, (CGBitmapInfo) kCGImageAlphaPremultipliedFirst);
-	CGColorSpaceRelease(colorSpaceInfo);
+	CGFloat width = targetWidth, height = targetHeight;
 	if (sourceImage.imageOrientation != UIImageOrientationUp && sourceImage.imageOrientation != UIImageOrientationDown) {
 		CGFloat i = targetHeight;
 		targetHeight = targetWidth;
 		targetWidth = i;
+		width -= (insets.left + insets.right) * scale;
+		height -= (insets.top + insets.bottom) * scale;
+	} else {
+		height -= (insets.left + insets.right) * scale;
+		width -= (insets.top + insets.bottom) * scale;
 	}
+	
+	CGContextRef bitmap = CGBitmapContextCreate(NULL, width, height, CGImageGetBitsPerComponent(imageRef), 0, colorSpaceInfo, (CGBitmapInfo) kCGImageAlphaPremultipliedFirst);
+	CGColorSpaceRelease(colorSpaceInfo);
 	
 	CGContextSetInterpolationQuality(bitmap, kCGInterpolationHigh);
 	
 	if (sourceImage.imageOrientation == UIImageOrientationLeft) {
 		CGContextRotateCTM (bitmap, M_PI / 2);
-		CGContextTranslateCTM (bitmap, 0 - insets.left * scale, -targetHeight - insets.top * scale);
+		CGContextTranslateCTM (bitmap, 0 - insets.top * scale, -targetHeight + insets.right * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationRight) {
 		CGContextRotateCTM (bitmap, -M_PI / 2);
 		//bottom, left
 		CGContextTranslateCTM (bitmap, - targetWidth + insets.bottom * scale, -insets.left * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationUp) {
-		CGContextTranslateCTM (bitmap, -insets.left * scale, -insets.top * scale);
+		CGContextTranslateCTM (bitmap, -insets.top * scale, -insets.right * scale);
 	} else if (sourceImage.imageOrientation == UIImageOrientationDown) {
-		CGContextTranslateCTM (bitmap, targetWidth - insets.left * scale, targetHeight - insets.top * scale);
+		CGContextTranslateCTM (bitmap, targetWidth - insets.bottom * scale, targetHeight - insets.left * scale);
 		CGContextRotateCTM (bitmap, -M_PI);
 	}
 	
