@@ -126,17 +126,18 @@
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
-	imageView.image = _originImage;
-	CGFloat width = self.view.bounds.size.width;
-	CGFloat height = width / _originImage.size.width  * _originImage.size.height;
-	_originImage = nil;
-	imageView.frame = CGRectMake(0, 0, width, height);
-	scrollview.contentSize = imageView.bounds.size;
-	
-	CGRect defaultVisible = scrollview.bounds;
-	defaultVisible.origin.y = (height - scrollview.bounds.size.height) / 2;
-	defaultVisible.origin.x = (width - scrollview.bounds.size.height) / 2;
-	[scrollview scrollRectToVisible:defaultVisible animated:NO];
+	if (!imageView.image) {
+		imageView.image = _originImage;
+		CGFloat width = self.view.bounds.size.width;
+		CGFloat height = width / _originImage.size.width  * _originImage.size.height;
+		imageView.frame = CGRectMake(0, 0, width, height);
+		scrollview.contentSize = imageView.bounds.size;
+		
+		CGRect defaultVisible = scrollview.bounds;
+		defaultVisible.origin.y = (height - scrollview.bounds.size.height) / 2;
+		defaultVisible.origin.x = (width - scrollview.bounds.size.height) / 2;
+		[scrollview scrollRectToVisible:defaultVisible animated:NO];
+	}
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
