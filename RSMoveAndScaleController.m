@@ -31,7 +31,7 @@
 {
 	UIImageView *imageView;
 	CALayer *scrollLayer;
-	UIScrollView *scrollview;
+	UIScrollView *scrollView;
 	UIScrollView *clippingView;
 }
 
@@ -67,26 +67,25 @@
 	clippingView.clipsToBounds = YES;
 	[self.view addSubview:clippingView];
 
-	scrollview = [[UIScrollView alloc] initWithFrame:self.scrollFrame];
-	scrollview.showsVerticalScrollIndicator = NO;
-	scrollview.showsHorizontalScrollIndicator = NO;
-	scrollview.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	scrollview.delegate = self;
-	[clippingView addSubview:scrollview];
+	scrollView = [[UIScrollView alloc] initWithFrame:self.scrollFrame];
+	scrollView.showsVerticalScrollIndicator = NO;
+	scrollView.showsHorizontalScrollIndicator = NO;
+	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+	scrollView.delegate = self;
+	[clippingView addSubview:scrollView];
 	imageView = [[UIImageView alloc] init];
 	imageView.contentMode = UIViewContentModeScaleAspectFit;
-	scrollview.zoomScale = 1.0;
-	scrollview.clipsToBounds = NO;
-	scrollview.minimumZoomScale = _minimumZoomScale;
-	scrollview.maximumZoomScale = _maximumZoomScale;
-	[scrollview addSubview:imageView];
+	scrollView.zoomScale = 1.0;
+	scrollView.clipsToBounds = NO;
+	scrollView.minimumZoomScale = _minimumZoomScale;
+	scrollView.maximumZoomScale = _maximumZoomScale;
+	[scrollView addSubview:imageView];
 	self.view.backgroundColor = self.foregroundColor;
 }
 
-- (void)viewDidAppear:(BOOL)animated
+- (void)viewWillAppear:(BOOL)animated
 {
-	[super viewDidAppear:animated];
-	
+	[super viewWillAppear:animated];
 	CALayer *mask = [CALayer layer];
 	mask.frame = clippingView.frame;
 	mask.backgroundColor = (self.foregroundColor ?: [UIColor blackColor]).CGColor;
@@ -95,25 +94,20 @@
 		scrollLayer.frame = self.scrollFrame;
 		scrollLayer.backgroundColor = [UIColor whiteColor].CGColor;
 	}
-	scrollview.frame = scrollLayer.frame;
+	scrollView.frame = scrollLayer.frame;
 	[mask addSublayer:scrollLayer];
 	clippingView.layer.mask = mask;
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-	[super viewWillAppear:animated];
 	if (!imageView.image) {
 		imageView.image = _originImage;
 		CGFloat width = self.view.bounds.size.width;
 		CGFloat height = width / _originImage.size.width  * _originImage.size.height;
 		imageView.frame = CGRectMake(0, 0, width, height);
-		scrollview.contentSize = imageView.bounds.size;
+		scrollView.contentSize = imageView.bounds.size;
 		
-		CGRect defaultVisible = scrollview.bounds;
-		defaultVisible.origin.y = (height - scrollview.bounds.size.height) / 2;
-		defaultVisible.origin.x = (width - scrollview.bounds.size.height) / 2;
-		[scrollview scrollRectToVisible:defaultVisible animated:NO];
+		CGRect defaultVisible = scrollView.bounds;
+		defaultVisible.origin.y = (height - scrollView.bounds.size.height) / 2;
+		defaultVisible.origin.x = (width - scrollView.bounds.size.height) / 2;
+		[scrollView scrollRectToVisible:defaultVisible animated:NO];
 	}
 }
 
@@ -126,7 +120,7 @@
 {
 	_destinationSize = destinationSize;
 	if (self.isViewLoaded) {
-		scrollLayer.frame = scrollview.frame = self.scrollFrame;
+		scrollLayer.frame = scrollView.frame = self.scrollFrame;
 	}
 }
 
@@ -145,21 +139,16 @@
 
 - (void)choose
 {
-	CGRect scrollFrame = imageView.superview.frame;
+	CGRect scrollFrame = scrollView.frame;
 	CGFloat min = MIN(scrollFrame.size.height, scrollFrame.size.width);
 	CGFloat x_2 = (scrollFrame.size.width - min) / 2;
 	CGFloat y_2 = (scrollFrame.size.height - min) / 2;
-	UIImage *snapshot = [imageView.superview RS_snapshot:UIEdgeInsetsMake(y_2, x_2, y_2, x_2)];
+	UIImage *snapshot = [scrollView RS_snapshot:UIEdgeInsetsMake(y_2, x_2, y_2, x_2)];
 	
 	if (self.destinationSize.width > 0 && self.destinationSize.height > 0) {
 		snapshot = [snapshot resizedImageFitSize:self.destinationSize];
 	}
 	[self.delegate moveAndScaleController:self didFinishCropping:snapshot];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 @end
