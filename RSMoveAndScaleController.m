@@ -66,7 +66,7 @@
 	clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	clippingView.clipsToBounds = YES;
 	[self.view addSubview:clippingView];
-
+	
 	scrollView = [[UIScrollView alloc] initWithFrame:self.scrollFrame];
 	scrollView.showsVerticalScrollIndicator = NO;
 	scrollView.showsHorizontalScrollIndicator = NO;
@@ -74,39 +74,35 @@
 	scrollView.delegate = self;
 	[clippingView addSubview:scrollView];
 	imageView = [[UIImageView alloc] init];
-	imageView.contentMode = UIViewContentModeScaleAspectFit;
+	imageView.contentMode = UIViewContentModeScaleAspectFill;
 	scrollView.zoomScale = 1.0;
 	scrollView.clipsToBounds = NO;
 	scrollView.minimumZoomScale = _minimumZoomScale;
 	scrollView.maximumZoomScale = _maximumZoomScale;
 	[scrollView addSubview:imageView];
 	self.view.backgroundColor = self.foregroundColor;
+	CALayer *mask = [CALayer layer];
+	mask.frame = clippingView.frame;
+	mask.backgroundColor = (self.foregroundColor ?: [UIColor blackColor]).CGColor;
+	scrollLayer = [CALayer layer];
+	scrollLayer.backgroundColor = [UIColor whiteColor].CGColor;
+	[mask addSublayer:scrollLayer];
+	clippingView.layer.mask = mask;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
-	CALayer *mask = [CALayer layer];
-	mask.frame = clippingView.frame;
-	mask.backgroundColor = (self.foregroundColor ?: [UIColor blackColor]).CGColor;
-	if (!scrollLayer) {
-		scrollLayer = [CALayer layer];
-		scrollLayer.frame = self.scrollFrame;
-		scrollLayer.backgroundColor = [UIColor whiteColor].CGColor;
-	}
-	scrollView.frame = scrollLayer.frame;
-	[mask addSublayer:scrollLayer];
-	clippingView.layer.mask = mask;
+	scrollView.frame = scrollLayer.frame = self.scrollFrame;
 	if (!imageView.image) {
 		imageView.image = _originImage;
 		CGFloat width = self.view.bounds.size.width;
 		CGFloat height = width / _originImage.size.width  * _originImage.size.height;
 		imageView.frame = CGRectMake(0, 0, width, height);
 		scrollView.contentSize = imageView.bounds.size;
-		
 		CGRect defaultVisible = scrollView.bounds;
-		defaultVisible.origin.y = (height - scrollView.bounds.size.height) / 2;
-		defaultVisible.origin.x = (width - scrollView.bounds.size.height) / 2;
+		defaultVisible.origin.y = (height - defaultVisible.size.height) / 2;
+		defaultVisible.origin.x = (width - defaultVisible.size.width) / 2;
 		[scrollView scrollRectToVisible:defaultVisible animated:NO];
 	}
 }
@@ -134,7 +130,7 @@
 	CGSize size = self.view.bounds.size;
 	CGFloat x = (size.width - _destinationSize.width) / 2;
 	CGFloat y = x * 1.5;
-	return CGRectMake(x, y, _destinationSize.width, _destinationSize.height);
+	return UIEdgeInsetsInsetRect(CGRectMake(x, y, _destinationSize.width, _destinationSize.height), self.scrollViewEdgeInsets);
 }
 
 - (void)choose
