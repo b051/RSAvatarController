@@ -9,30 +9,12 @@
 
 #define PANEL_HEIGHT 96
 
-@implementation UIView (snapshot)
-
-- (UIImage *)RS_snapshot:(UIEdgeInsets)insets
-{
-	CALayer *layer = self.layer;
-	CGRect rect = UIEdgeInsetsInsetRect(layer.frame, insets);
-	UIGraphicsBeginImageContextWithOptions(rect.size, NO, [UIScreen mainScreen].scale);
-	CGContextRef ctx = UIGraphicsGetCurrentContext();
-	CGPoint vorigin = layer.visibleRect.origin;
-	CGContextTranslateCTM(ctx, -vorigin.x - insets.left, -vorigin.y - insets.top);
-	[layer renderInContext:ctx];
-	UIImage *snapshot = UIGraphicsGetImageFromCurrentImageContext();
-	UIGraphicsEndImageContext();
-	return snapshot;
-}
-
-@end
-
 @implementation RSMoveAndScaleController
 {
 	UIImageView *imageView;
 	CALayer *scrollLayer;
 	UIScrollView *scrollView;
-	UIScrollView *clippingView;
+	UIView *clippingView;
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -40,6 +22,7 @@
 	if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
 		_minimumZoomScale = 1.0;
 		_maximumZoomScale = 3.0;
+		_destinationSize = CGSizeMake(320, 320);
 	}
 	return self;
 }
@@ -62,12 +45,12 @@
 		self.overlayView.frame = self.view.bounds;
 	}
 	[self.view addSubview:self.overlayView];
-	clippingView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height - bottomHeight)];
+	clippingView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height - bottomHeight)];
 	clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	clippingView.clipsToBounds = YES;
 	[self.view addSubview:clippingView];
 	
-	scrollView = [[UIScrollView alloc] initWithFrame:self.scrollFrame];
+	scrollView = [[UIScrollView alloc] initWithFrame:clippingView.bounds];
 	scrollView.showsVerticalScrollIndicator = NO;
 	scrollView.showsHorizontalScrollIndicator = NO;
 	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -93,7 +76,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
-	scrollView.frame = scrollLayer.frame = self.scrollFrame;
+	scrollLayer.frame = self.scrollFrame;
 	if (!imageView.image) {
 		imageView.image = _originImage;
 		CGFloat width = self.view.bounds.size.width;
@@ -116,7 +99,7 @@
 {
 	_destinationSize = destinationSize;
 	if (self.isViewLoaded) {
-		scrollLayer.frame = scrollView.frame = self.scrollFrame;
+		scrollLayer.frame = self.scrollFrame;
 	}
 }
 
@@ -135,15 +118,15 @@
 
 - (void)choose
 {
-	CGRect scrollFrame = scrollView.frame;
-	CGFloat min = MIN(scrollFrame.size.height, scrollFrame.size.width);
-	CGFloat x_2 = (scrollFrame.size.width - min) / 2;
-	CGFloat y_2 = (scrollFrame.size.height - min) / 2;
-	UIImage *snapshot = [scrollView RS_snapshot:UIEdgeInsetsMake(y_2, x_2, y_2, x_2)];
-	
-	if (self.destinationSize.width > 0 && self.destinationSize.height > 0) {
-		snapshot = [snapshot resizedImageFitSize:self.destinationSize];
-	}
+	CGRect scrollFrame = scrollLayer.frame;
+	CALayer *layer = scrollView.layer;
+	UIGraphicsBeginImageContextWithOptions(self.destinationSize, NO, [UIScreen mainScreen].scale);
+	CGContextRef ctx = UIGraphicsGetCurrentContext();
+	CGPoint vorigin = layer.visibleRect.origin;
+	CGContextTranslateCTM(ctx, -vorigin.x - scrollFrame.origin.x, -vorigin.y - scrollFrame.origin.y);
+	[layer renderInContext:ctx];
+	UIImage *snapshot = UIGraphicsGetImageFromCurrentImageContext();
+	UIGraphicsEndImageContext();
 	[self.delegate moveAndScaleController:self didFinishCropping:snapshot];
 }
 

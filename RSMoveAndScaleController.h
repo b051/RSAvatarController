@@ -20,11 +20,11 @@
 
 @property (nonatomic, strong) UIImage *originImage;
 @property (nonatomic, strong) UIView *overlayView;
-@property (nonatomic) CGSize destinationSize;
-@property (nonatomic) UIEdgeInsets scrollViewEdgeInsets;
+@property (nonatomic) CGSize destinationSize UI_APPEARANCE_SELECTOR;
+@property (nonatomic) UIEdgeInsets scrollViewEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (nonatomic) CGFloat minimumZoomScale UI_APPEARANCE_SELECTOR;
 @property (nonatomic) CGFloat maximumZoomScale UI_APPEARANCE_SELECTOR;
-@property (nonatomic, strong) UIColor *foregroundColor;
+@property (nonatomic, strong) UIColor *foregroundColor UI_APPEARANCE_SELECTOR;
 @property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
 
 @end
