@@ -35,6 +35,15 @@
 	UIScrollView *clippingView;
 }
 
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+	if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+		_minimumZoomScale = 1.0;
+		_maximumZoomScale = 3.0;
+	}
+	return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -68,8 +77,8 @@
 	imageView.contentMode = UIViewContentModeScaleAspectFit;
 	scrollview.zoomScale = 1.0;
 	scrollview.clipsToBounds = NO;
-	scrollview.minimumZoomScale = 0.5;
-	scrollview.maximumZoomScale = 2.0;
+	scrollview.minimumZoomScale = _minimumZoomScale;
+	scrollview.maximumZoomScale = _maximumZoomScale;
 	[scrollview addSubview:imageView];
 	self.view.backgroundColor = self.foregroundColor;
 }
