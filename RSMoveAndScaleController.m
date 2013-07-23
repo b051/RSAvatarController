@@ -9,12 +9,18 @@
 
 #define PANEL_HEIGHT 96
 
+@interface RSMoveAndScaleController ()
+
+@property (nonatomic, weak) UIScrollView *scrollView;
+
+@end
+
 @implementation RSMoveAndScaleController
 {
 	UIImageView *imageView;
 	CALayer *scrollLayer;
-	UIScrollView *scrollView;
 	UIView *clippingView;
+	CGPoint threshold;
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -30,6 +36,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+	self.view.backgroundColor = self.foregroundColor;
 	self.contentSizeForViewInPopover = CGSizeMake(320, 443);
 	CGRect frame = self.overlayView.frame;
 	CGSize size = self.view.bounds.size;
@@ -50,20 +57,6 @@
 	clippingView.clipsToBounds = YES;
 	[self.view addSubview:clippingView];
 	
-	scrollView = [[UIScrollView alloc] initWithFrame:clippingView.bounds];
-	scrollView.showsVerticalScrollIndicator = NO;
-	scrollView.showsHorizontalScrollIndicator = NO;
-	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-	scrollView.delegate = self;
-	[clippingView addSubview:scrollView];
-	imageView = [[UIImageView alloc] init];
-	imageView.contentMode = UIViewContentModeScaleAspectFill;
-	scrollView.zoomScale = 1.0;
-	scrollView.clipsToBounds = NO;
-	scrollView.minimumZoomScale = _minimumZoomScale;
-	scrollView.maximumZoomScale = _maximumZoomScale;
-	[scrollView addSubview:imageView];
-	self.view.backgroundColor = self.foregroundColor;
 	CALayer *mask = [CALayer layer];
 	mask.frame = clippingView.frame;
 	mask.backgroundColor = (self.foregroundColor ?: [UIColor blackColor]).CGColor;
@@ -71,6 +64,24 @@
 	scrollLayer.backgroundColor = [UIColor whiteColor].CGColor;
 	[mask addSublayer:scrollLayer];
 	clippingView.layer.mask = mask;
+	
+	UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:clippingView.bounds];
+	scrollView.showsVerticalScrollIndicator = NO;
+	scrollView.showsHorizontalScrollIndicator = NO;
+	scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+	scrollView.delegate = self;
+	scrollView.zoomScale = 1.0;
+	scrollView.clipsToBounds = NO;
+	scrollView.minimumZoomScale = _minimumZoomScale;
+	scrollView.maximumZoomScale = _maximumZoomScale;
+	scrollView.scrollEnabled = YES;
+	scrollView.alwaysBounceHorizontal = YES;
+	scrollView.alwaysBounceVertical = YES;
+	[clippingView addSubview:_scrollView = scrollView];
+	
+	imageView = [[UIImageView alloc] init];
+	imageView.contentMode = UIViewContentModeScaleAspectFill;
+	[scrollView addSubview:imageView];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -81,18 +92,32 @@
 		imageView.image = _originImage;
 		CGFloat width = self.view.bounds.size.width;
 		CGFloat height = width / _originImage.size.width  * _originImage.size.height;
-		imageView.frame = CGRectMake(0, 0, width, height);
-		scrollView.contentSize = imageView.bounds.size;
-		CGRect defaultVisible = scrollView.bounds;
-		defaultVisible.origin.y = (height - defaultVisible.size.height) / 2;
-		defaultVisible.origin.x = (width - defaultVisible.size.width) / 2;
-		[scrollView scrollRectToVisible:defaultVisible animated:NO];
+		CGPoint origin = scrollLayer.frame.origin;
+		CGSize size = CGSizeMake(width, height);
+		threshold = CGPointMake((width - self.destinationSize.width) / 2, (height - self.destinationSize.height) / 2);
+		imageView.frame = (CGRect){.size = size, .origin.y = origin.y - threshold.y};
+		_scrollView.contentSize = size;
 	}
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+	CGFloat scale = scrollView.zoomScale;
+//	NSLog(@"scale=%f offset=%f, %f", scale, scrollView.contentOffset.x, scrollView.contentOffset.y);
+	CGPoint offset = scrollView.contentOffset;
+	CGSize size = scrollView.contentSize;
+	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * (scale - 1), threshold.y + size.height * (scale - 1));
+	offset.y = MAX(MIN(offset.y, t.y), -threshold.y);
+	offset.x = MAX(MIN(offset.x, t.x), -threshold.x);
+	scrollView.contentOffset = offset;
+	scrollView.contentInset = UIEdgeInsetsMake(-offset.y, -offset.x, 0, 0);
 }
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
-	return imageView;
+	if (scrollView == _scrollView)
+		return imageView;
+	return nil;
 }
 
 - (void)setDestinationSize:(CGSize)destinationSize
@@ -119,7 +144,7 @@
 - (void)choose
 {
 	CGRect scrollFrame = scrollLayer.frame;
-	CALayer *layer = scrollView.layer;
+	CALayer *layer = _scrollView.layer;
 	UIGraphicsBeginImageContextWithOptions(self.destinationSize, NO, [UIScreen mainScreen].scale);
 	CGContextRef ctx = UIGraphicsGetCurrentContext();
 	CGPoint vorigin = layer.visibleRect.origin;
