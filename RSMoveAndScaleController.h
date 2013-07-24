@@ -7,24 +7,33 @@
 #import <UIKit/UIKit.h>
 #import "RSAvatarController.h"
 
-@class RSMoveAndScaleController;
+@interface RSMoveAndScaleView : UIView
+
+@property (nonatomic) CGSize destinationSize UI_APPEARANCE_SELECTOR;
+@property (nonatomic) UIEdgeInsets scrollingViewEdgeInsets UI_APPEARANCE_SELECTOR;
+@property (nonatomic) CGFloat minimumZoomScale UI_APPEARANCE_SELECTOR;
+@property (nonatomic) CGFloat maximumZoomScale UI_APPEARANCE_SELECTOR;
+@property (nonatomic, strong) UIColor *maskForegroundColor UI_APPEARANCE_SELECTOR;
+
+@end
+
+
+@protocol RSMoveAndScaleControllerDelegate;
+
+@interface RSMoveAndScaleController : UIViewController <RSMoveAndScaleTrait, UIScrollViewDelegate>
+
+@property (nonatomic, strong, readonly) RSMoveAndScaleView *clippingView;
+@property (nonatomic, strong) UIImage *originImage;
+@property (nonatomic, strong) UIView *overlayView;
+@property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
+@property (nonatomic) CGSize destinationSize;
+
+@end
+
 
 @protocol RSMoveAndScaleControllerDelegate <NSObject>
 
 - (void)moveAndScaleController:(RSMoveAndScaleController *)moveAndScale didFinishCropping:(UIImage *)destImage;
 - (void)moveAndScaleControllerDidCancel:(RSMoveAndScaleController *)moveAndScale;
-
-@end
-
-@interface RSMoveAndScaleController : UIViewController <RSMoveAndScaleTrait, UIScrollViewDelegate>
-
-@property (nonatomic, strong) UIImage *originImage;
-@property (nonatomic, strong) UIView *overlayView;
-@property (nonatomic) CGSize destinationSize UI_APPEARANCE_SELECTOR;
-@property (nonatomic) UIEdgeInsets scrollViewEdgeInsets UI_APPEARANCE_SELECTOR;
-@property (nonatomic) CGFloat minimumZoomScale UI_APPEARANCE_SELECTOR;
-@property (nonatomic) CGFloat maximumZoomScale UI_APPEARANCE_SELECTOR;
-@property (nonatomic, strong) UIColor *foregroundColor UI_APPEARANCE_SELECTOR;
-@property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
 
 @end

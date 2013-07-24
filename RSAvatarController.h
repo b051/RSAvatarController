@@ -9,7 +9,7 @@
 - (void)choose;
 @end
 
-@protocol RSAvatarControllerDelegate <NSObject>
+@protocol RSAvatarControllerDelegate <UINavigationControllerDelegate>
 - (void)pickerController:(UIImagePickerController *)picker pickedAvatar:(UIImage *)avatar;
 - (UIView *)overlayForMoveAndScale:(id<RSMoveAndScaleTrait>)trait;
 - (CGRect)rectForAvatarPopover;

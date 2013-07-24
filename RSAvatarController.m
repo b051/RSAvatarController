@@ -135,4 +135,17 @@
 	_imagePicker = nil;
 }
 
+#pragma mark - UINavigationControllerDelegate
+- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+	if ([self.delegate respondsToSelector:@selector(navigationController:didShowViewController:animated:)])
+		[self.delegate navigationController:navigationController didShowViewController:viewController animated:animated];
+}
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+	if ([self.delegate respondsToSelector:@selector(navigationController:willShowViewController:animated:)])
+		[self.delegate navigationController:navigationController willShowViewController:viewController animated:animated];
+}
+
 @end
