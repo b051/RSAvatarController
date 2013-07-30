@@ -25,7 +25,6 @@
 - (id)initWithFrame:(CGRect)frame
 {
 	if (self = [super initWithFrame:frame]) {
-		_minimumZoomScale = 1.0;
 		_maximumZoomScale = 3.0;
 		_destinationSize = CGSizeMake(320, 320);
 		
@@ -43,7 +42,6 @@
 		scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		scrollView.zoomScale = 1.0;
 		scrollView.clipsToBounds = NO;
-		scrollView.minimumZoomScale = _minimumZoomScale;
 		scrollView.maximumZoomScale = _maximumZoomScale;
 		scrollView.scrollEnabled = YES;
 		scrollView.alwaysBounceHorizontal = YES;
@@ -55,6 +53,12 @@
 		[scrollView addSubview:_imageView = imageView];
 	}
 	return self;
+}
+
+- (void)setMaximumZoomScale:(CGFloat)maximumZoomScale
+{
+	_maximumZoomScale = maximumZoomScale;
+	_scrollView.maximumZoomScale = maximumZoomScale;
 }
 
 - (void)setMaskForegroundColor:(UIColor *)maskForegroundColor
@@ -73,6 +77,7 @@
 	size = _imageView.frame.size;
 	threshold = CGPointMake((size.width - self.destinationSize.width) / 2, (size.height - self.destinationSize.height) / 2);
 	_imageView.frame = (CGRect){.size = size, .origin.y = scrollLayer.frame.origin.y - threshold.y};
+	_scrollView.minimumZoomScale = MAX(_scrollView.bounds.size.width / size.width, _scrollView.bounds.size.height / size.height);
 }
 
 - (void)limitScrollViewInBounds
@@ -154,6 +159,7 @@
 	clippingView.scrollView.delegate = self;
 	clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	clippingView.clipsToBounds = YES;
+	if (_maximumZoomScale) clippingView.maximumZoomScale = _maximumZoomScale;
 	[self.view addSubview:_clippingView = clippingView];
 }
 
@@ -174,6 +180,12 @@
 	if (scrollView == _clippingView.scrollView)
 		return _clippingView.imageView;
 	return nil;
+}
+
+- (void)setMaximumZoomScale:(CGFloat)maximumZoomScale
+{
+	_maximumZoomScale = maximumZoomScale;
+	_clippingView.maximumZoomScale = maximumZoomScale;
 }
 
 - (void)setDestinationSize:(CGSize)destinationSize
