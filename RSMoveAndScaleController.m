@@ -77,7 +77,7 @@
 	size = _imageView.frame.size;
 	threshold = CGPointMake((size.width - self.destinationSize.width) / 2, (size.height - self.destinationSize.height) / 2);
 	_imageView.frame = (CGRect){.size = size, .origin.y = scrollLayer.frame.origin.y - threshold.y};
-	_scrollView.minimumZoomScale = MAX(_scrollView.bounds.size.width / size.width, _scrollView.bounds.size.height / size.height);
+	_scrollView.minimumZoomScale = MAX(scrollLayer.bounds.size.width / size.width, scrollLayer.bounds.size.height / size.height);
 }
 
 - (void)limitScrollViewInBounds
