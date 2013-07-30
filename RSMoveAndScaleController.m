@@ -77,7 +77,7 @@
 	size = _imageView.frame.size;
 	threshold = CGPointMake((size.width - self.destinationSize.width) / 2, (size.height - self.destinationSize.height) / 2);
 	_imageView.frame = (CGRect){.size = size, .origin.y = scrollLayer.frame.origin.y - threshold.y};
-	_scrollView.minimumZoomScale = MAX(scrollLayer.bounds.size.width / size.width, scrollLayer.bounds.size.height / size.height);
+	_scrollView.minimumZoomScale = MIN(scrollLayer.bounds.size.width / size.width, scrollLayer.bounds.size.height / size.height);
 }
 
 - (void)limitScrollViewInBounds
@@ -89,6 +89,8 @@
 	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * (scale - 1), threshold.y + size.height * (scale - 1));
 	offset.y = MAX(MIN(offset.y, t.y), -threshold.y);
 	offset.x = MAX(MIN(offset.x, t.x), -threshold.x);
+	offset.y = MIN(offset.y, -(_scrollView.bounds.size.height - size.height) / 2);
+	offset.x = MIN(offset.x, -(_scrollView.bounds.size.width - size.width) / 2);
 	_scrollView.contentOffset = offset;
 	_scrollView.contentInset = UIEdgeInsetsMake(-offset.y, -offset.x, 0, 0);
 }
