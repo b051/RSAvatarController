@@ -20,12 +20,12 @@
 {
 	CALayer *scrollLayer;
 	CGPoint threshold;
+	CGFloat minimumScale;
 }
 
 - (id)initWithFrame:(CGRect)frame
 {
 	if (self = [super initWithFrame:frame]) {
-		_minimumZoomScale = 1.0;
 		_maximumZoomScale = 3.0;
 		_destinationSize = CGSizeMake(320, 320);
 		
@@ -43,7 +43,6 @@
 		scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		scrollView.zoomScale = 1.0;
 		scrollView.clipsToBounds = NO;
-		scrollView.minimumZoomScale = _minimumZoomScale;
 		scrollView.maximumZoomScale = _maximumZoomScale;
 		scrollView.scrollEnabled = YES;
 		scrollView.alwaysBounceHorizontal = YES;
@@ -55,6 +54,12 @@
 		[scrollView addSubview:_imageView = imageView];
 	}
 	return self;
+}
+
+- (void)setMaximumZoomScale:(CGFloat)maximumZoomScale
+{
+	_maximumZoomScale = maximumZoomScale;
+	_scrollView.maximumZoomScale = maximumZoomScale;
 }
 
 - (void)setMaskForegroundColor:(UIColor *)maskForegroundColor
@@ -73,15 +78,30 @@
 	size = _imageView.frame.size;
 	threshold = CGPointMake((size.width - self.destinationSize.width) / 2, (size.height - self.destinationSize.height) / 2);
 	_imageView.frame = (CGRect){.size = size, .origin.y = scrollLayer.frame.origin.y - threshold.y};
+	if (size.width > 0 && size.height > 0) {
+		CGFloat height = scrollLayer.bounds.size.height, width = scrollLayer.bounds.size.width;
+		CGFloat frameRatio = width / height;
+		CGFloat imageRatio = size.width / size.height;
+		// fit
+		if (imageRatio < frameRatio) {
+			width = height * imageRatio;
+		}
+		minimumScale = width / size.width;
+		
+		_scrollView.minimumZoomScale = minimumScale;
+		_scrollView.maximumZoomScale = MAX(minimumScale * 1.5, _scrollView.maximumZoomScale);
+		_scrollView.contentSize = size;
+	}
 }
 
 - (void)limitScrollViewInBounds
 {
-	CGFloat scale = _scrollView.zoomScale;
-	//	NSLog(@"scale=%f offset=%f, %f", scale, scrollView.contentOffset.x, scrollView.contentOffset.y);
 	CGPoint offset = _scrollView.contentOffset;
 	CGSize size = _scrollView.contentSize;
-	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * (scale - 1), threshold.y + size.height * (scale - 1));
+	CGFloat scale = (1 - 1 / _scrollView.zoomScale);
+//	NSLog(@"scale %f offset:%@", scale, NSStringFromCGPoint(offset));
+	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * scale, threshold.y + size.height * scale);
+	
 	offset.y = MAX(MIN(offset.y, t.y), -threshold.y);
 	offset.x = MAX(MIN(offset.x, t.x), -threshold.x);
 	_scrollView.contentOffset = offset;
@@ -108,7 +128,6 @@
 		CGFloat height = width / image.size.width  * image.size.height;
 		CGSize size = CGSizeMake(width, height);
 		_imageView.frame = (CGRect){.size = size};
-		_scrollView.contentSize = size;
 		[self adjustView];
 	}
 }
@@ -134,7 +153,7 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+	[super viewDidLoad];
 	self.contentSizeForViewInPopover = CGSizeMake(320, 443);
 	CGRect frame = self.overlayView.frame;
 	CGSize size = self.view.bounds.size;
@@ -154,6 +173,7 @@
 	clippingView.scrollView.delegate = self;
 	clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	clippingView.clipsToBounds = YES;
+	if (_maximumZoomScale) clippingView.maximumZoomScale = _maximumZoomScale;
 	[self.view addSubview:_clippingView = clippingView];
 }
 
@@ -174,6 +194,12 @@
 	if (scrollView == _clippingView.scrollView)
 		return _clippingView.imageView;
 	return nil;
+}
+
+- (void)setMaximumZoomScale:(CGFloat)maximumZoomScale
+{
+	_maximumZoomScale = maximumZoomScale;
+	_clippingView.maximumZoomScale = maximumZoomScale;
 }
 
 - (void)setDestinationSize:(CGSize)destinationSize

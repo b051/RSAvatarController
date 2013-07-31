@@ -11,7 +11,6 @@
 
 @property (nonatomic) CGSize destinationSize UI_APPEARANCE_SELECTOR;
 @property (nonatomic) UIEdgeInsets scrollingViewEdgeInsets UI_APPEARANCE_SELECTOR;
-@property (nonatomic) CGFloat minimumZoomScale UI_APPEARANCE_SELECTOR;
 @property (nonatomic) CGFloat maximumZoomScale UI_APPEARANCE_SELECTOR;
 @property (nonatomic, strong) UIColor *maskForegroundColor UI_APPEARANCE_SELECTOR;
 
@@ -25,11 +24,13 @@
 @property (nonatomic, strong, readonly) RSMoveAndScaleView *clippingView;
 @property (nonatomic, strong) UIImage *originImage;
 @property (nonatomic, strong) UIView *overlayView;
+@property (nonatomic) CGFloat maximumZoomScale;
+@property (nonatomic) UIViewContentMode minimumContentMode; // you can only set it to UIViewContentModeScaleAspectFit or UIViewContentModeScaleAspectFill. Default to UIViewContentModeScaleAspectFit
+
 @property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
 @property (nonatomic) CGSize destinationSize;
 
 @end
-
 
 @protocol RSMoveAndScaleControllerDelegate <NSObject>
 
