@@ -20,6 +20,7 @@
 {
 	CALayer *scrollLayer;
 	CGPoint threshold;
+	CGFloat minimumScale;
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -75,24 +76,61 @@
 	CGFloat y = x * 1.5;
 	scrollLayer.frame = UIEdgeInsetsInsetRect(CGRectMake(x, y, _destinationSize.width, _destinationSize.height), self.scrollingViewEdgeInsets);
 	size = _imageView.frame.size;
-	threshold = CGPointMake((size.width - self.destinationSize.width) / 2, (size.height - self.destinationSize.height) / 2);
-	_imageView.frame = (CGRect){.size = size, .origin.y = scrollLayer.frame.origin.y - threshold.y};
-	_scrollView.minimumZoomScale = MIN(scrollLayer.bounds.size.width / size.width, scrollLayer.bounds.size.height / size.height);
+	if (size.width > 0 && size.height > 0) {
+		CGFloat height = scrollLayer.bounds.size.height, width = scrollLayer.bounds.size.width;
+		CGFloat frameRatio = width / height;
+		CGFloat imageRatio = size.width / size.height;
+		if (imageRatio < frameRatio) {
+			width = height * imageRatio;
+		}
+		CGFloat scale = width / size.height;
+		size.width *= scale;
+		size.height *= scale;
+		threshold = CGPointMake((size.width - _destinationSize.width) / 2, (size.height - _destinationSize.height) / 2);
+		_imageView.frame = (CGRect){.size = size, .origin = CGPointMake(-threshold.x + scrollLayer.frame.origin.x, -threshold.y + scrollLayer.frame.origin.y)};
+		_scrollView.contentSize = size;
+		_scrollView.contentOffset = CGPointZero;
+		minimumScale = scale;
+		_scrollView.minimumZoomScale = scale;
+		_scrollView.maximumZoomScale = MAX(scale, _scrollView.maximumZoomScale);
+	}
 }
 
 - (void)limitScrollViewInBounds
 {
-	CGFloat scale = _scrollView.zoomScale;
-	//	NSLog(@"scale=%f offset=%f, %f", scale, scrollView.contentOffset.x, scrollView.contentOffset.y);
+/*	CGFloat scale = _scrollView.zoomScale;
+//	NSLog(@"scale=%f offset=%f, %f", scale, _scrollView.contentOffset.x, _scrollView.contentOffset.y);
 	CGPoint offset = _scrollView.contentOffset;
 	CGSize size = _scrollView.contentSize;
-	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * (scale - 1), threshold.y + size.height * (scale - 1));
+	CGFloat up = scale / minimumScale;
+	//better, but still have problem
+	CGPoint t = CGPointMake((size.width * up - _destinationSize.width) / 2, (size.height * up - _destinationSize.height) / 2);
 	offset.y = MAX(MIN(offset.y, t.y), -threshold.y);
 	offset.x = MAX(MIN(offset.x, t.x), -threshold.x);
-	offset.y = MIN(offset.y, -(_scrollView.bounds.size.height - size.height) / 2);
-	offset.x = MIN(offset.x, -(_scrollView.bounds.size.width - size.width) / 2);
 	_scrollView.contentOffset = offset;
-	_scrollView.contentInset = UIEdgeInsetsMake(-offset.y, -offset.x, 0, 0);
+	_scrollView.contentInset = UIEdgeInsetsMake(-offset.y, -offset.x, 0, 0);*/
+	CGSize boundsSize = _scrollView.bounds.size;
+    CGRect contentsFrame = _imageView.frame;
+	CGSize size = _scrollView.contentSize;
+    
+    if (contentsFrame.size.width < _destinationSize.width) {
+        contentsFrame.origin.x = (boundsSize.width - contentsFrame.size.width) / 2.0f;
+		size.width = boundsSize.width;
+
+    } else {
+        contentsFrame.origin.x = (boundsSize.width - _destinationSize.width) / 2;
+		size.width = contentsFrame.size.width + boundsSize.width - _destinationSize.width;
+    }
+    
+    if (contentsFrame.size.height < _destinationSize.height) {
+        contentsFrame.origin.y = (boundsSize.height - contentsFrame.size.height) / 2.0f;
+		size.height = boundsSize.height;
+    } else {
+        contentsFrame.origin.y = (boundsSize.height - _destinationSize.height) / 2;
+		size.height = contentsFrame.size.height + boundsSize.height - _destinationSize.height;
+    }
+	_scrollView.contentSize = size;
+    _imageView.frame = contentsFrame;
 }
 
 - (void)setDestinationSize:(CGSize)destinationSize
@@ -115,7 +153,6 @@
 		CGFloat height = width / image.size.width  * image.size.height;
 		CGSize size = CGSizeMake(width, height);
 		_imageView.frame = (CGRect){.size = size};
-		_scrollView.contentSize = size;
 		[self adjustView];
 	}
 }
