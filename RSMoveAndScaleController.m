@@ -105,18 +105,18 @@
     if (contentsFrame.size.width < _destinationSize.width) {
         contentsFrame.origin.x = (boundsSize.width - contentsFrame.size.width) / 2.0f;
 		size.width = boundsSize.width;
-
+		
     } else {
-        contentsFrame.origin.x = (boundsSize.width - scrollLayer.frame.size.width) / 2;
-		size.width = contentsFrame.size.width + boundsSize.width - scrollLayer.frame.size.width;
+        contentsFrame.origin.x = scrollLayer.frame.origin.x;
+		size.width = contentsFrame.size.width + (boundsSize.width - scrollLayer.frame.size.width);
     }
     
     if (contentsFrame.size.height < _destinationSize.height) {
         contentsFrame.origin.y = (boundsSize.height - contentsFrame.size.height) / 2.0f;
 		size.height = boundsSize.height;
     } else {
-        contentsFrame.origin.y = (boundsSize.height - scrollLayer.frame.size.height)/ 2 + self.scrollingViewEdgeInsets.top;
-		size.height = contentsFrame.size.height + contentsFrame.origin.y * 2;
+        contentsFrame.origin.y = scrollLayer.frame.origin.y;
+		size.height = contentsFrame.size.height + (boundsSize.height - scrollLayer.frame.size.height);
     }
 	_scrollView.contentSize = size;
     _imageView.frame = contentsFrame;
