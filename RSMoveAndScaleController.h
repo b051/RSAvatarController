@@ -25,11 +25,12 @@
 @property (nonatomic, strong) UIImage *originImage;
 @property (nonatomic, strong) UIView *overlayView;
 @property (nonatomic) CGFloat maximumZoomScale;
+@property (nonatomic) UIViewContentMode minimumContentMode; // you can only set it to UIViewContentModeScaleAspectFit or UIViewContentModeScaleAspectFill. Default to UIViewContentModeScaleAspectFit
+
 @property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
 @property (nonatomic) CGSize destinationSize;
 
 @end
-
 
 @protocol RSMoveAndScaleControllerDelegate <NSObject>
 
