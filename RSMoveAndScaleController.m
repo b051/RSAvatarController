@@ -7,8 +7,6 @@
 #import "RSMoveAndScaleController.h"
 #import "UIImage+WithShadow.h"
 
-#define PANEL_HEIGHT 96
-
 @interface RSMoveAndScaleView ()
 
 @property (nonatomic, weak) UIScrollView *scrollView;
