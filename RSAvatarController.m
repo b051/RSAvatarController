@@ -7,6 +7,7 @@
 
 #import "RSAvatarController.h"
 #import "RSMoveAndScaleController.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface RSAvatarController () <UIActionSheetDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, RSMoveAndScaleControllerDelegate, UIPopoverControllerDelegate>
 @end

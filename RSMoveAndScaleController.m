@@ -5,7 +5,6 @@
 //
 
 #import "RSMoveAndScaleController.h"
-#import "UIImage+WithShadow.h"
 
 @interface RSMoveAndScaleView ()
 

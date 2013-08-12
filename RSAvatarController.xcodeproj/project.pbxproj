@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		CF2886B9177AB26300B43887 /* RSAvatarController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF2886B8177AB26300B43887 /* RSAvatarController.m */; };
 		CF2886BF177AB34A00B43887 /* RSMoveAndScaleController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF2886BE177AB34A00B43887 /* RSMoveAndScaleController.m */; };
-		CF2886C2177AB3F500B43887 /* UIImage+WithShadow.m in Sources */ = {isa = PBXBuildFile; fileRef = CF2886C1177AB3F500B43887 /* UIImage+WithShadow.m */; };
+		CF7B83AD17B8E34D00913E5B /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CF7B83AC17B8E34D00913E5B /* QuartzCore.framework */; };
 		CFA94337177AB13E005782D7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFA94336177AB13E005782D7 /* UIKit.framework */; };
 		CFA94339177AB13E005782D7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFA94338177AB13E005782D7 /* Foundation.framework */; };
 		CFA9433B177AB13E005782D7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFA9433A177AB13E005782D7 /* CoreGraphics.framework */; };
@@ -26,8 +26,7 @@
 		CF2886B8177AB26300B43887 /* RSAvatarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSAvatarController.m; sourceTree = "<group>"; };
 		CF2886BD177AB34A00B43887 /* RSMoveAndScaleController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMoveAndScaleController.h; sourceTree = "<group>"; };
 		CF2886BE177AB34A00B43887 /* RSMoveAndScaleController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSMoveAndScaleController.m; sourceTree = "<group>"; };
-		CF2886C0177AB3F500B43887 /* UIImage+WithShadow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+WithShadow.h"; sourceTree = "<group>"; };
-		CF2886C1177AB3F500B43887 /* UIImage+WithShadow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+WithShadow.m"; sourceTree = "<group>"; };
+		CF7B83AC17B8E34D00913E5B /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		CFA94333177AB13E005782D7 /* RSAvatarController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RSAvatarController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFA94336177AB13E005782D7 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		CFA94338177AB13E005782D7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -48,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF7B83AD17B8E34D00913E5B /* QuartzCore.framework in Frameworks */,
 				CFA94337177AB13E005782D7 /* UIKit.framework in Frameworks */,
 				CFA94339177AB13E005782D7 /* Foundation.framework in Frameworks */,
 				CFA9433B177AB13E005782D7 /* CoreGraphics.framework in Frameworks */,
@@ -64,8 +64,6 @@
 				CF2886B8177AB26300B43887 /* RSAvatarController.m */,
 				CF2886BD177AB34A00B43887 /* RSMoveAndScaleController.h */,
 				CF2886BE177AB34A00B43887 /* RSMoveAndScaleController.m */,
-				CF2886C0177AB3F500B43887 /* UIImage+WithShadow.h */,
-				CF2886C1177AB3F500B43887 /* UIImage+WithShadow.m */,
 			);
 			name = Vendor;
 			sourceTree = "<group>";
@@ -91,6 +89,7 @@
 		CFA94335177AB13E005782D7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CF7B83AC17B8E34D00913E5B /* QuartzCore.framework */,
 				CFA94336177AB13E005782D7 /* UIKit.framework */,
 				CFA94338177AB13E005782D7 /* Foundation.framework */,
 				CFA9433A177AB13E005782D7 /* CoreGraphics.framework */,
@@ -192,7 +191,6 @@
 				CF2886BF177AB34A00B43887 /* RSMoveAndScaleController.m in Sources */,
 				CF2886B9177AB26300B43887 /* RSAvatarController.m in Sources */,
 				CFA94347177AB13E005782D7 /* RSAppDelegate.m in Sources */,
-				CF2886C2177AB3F500B43887 /* UIImage+WithShadow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
