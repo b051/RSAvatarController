@@ -5,6 +5,7 @@
 //
 
 #import "RSMoveAndScaleController.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface RSMoveAndScaleView ()
 
