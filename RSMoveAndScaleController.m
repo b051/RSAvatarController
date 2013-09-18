@@ -80,6 +80,7 @@
 		CGFloat height = scrollLayer.bounds.size.height, width = scrollLayer.bounds.size.width;
 		CGFloat frameRatio = width / height;
 		CGFloat imageRatio = size.width / size.height;
+
 		// fit
 		if (imageRatio < frameRatio) {
 			width = height * imageRatio;

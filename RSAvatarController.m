@@ -38,7 +38,11 @@
 		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Select from Gallery", nil];
 	}
 	_actionSheet.actionSheetStyle = sheetStyle;
-	[_actionSheet showInView:viewController.view];
+	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+		[_actionSheet showFromRect:[self.delegate rectForAvatarPopover] inView:viewController.view animated:YES];
+	} else {
+		[_actionSheet showInView:viewController.view];
+	}
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
