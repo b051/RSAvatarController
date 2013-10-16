@@ -149,6 +149,11 @@
 
 @implementation RSMoveAndScaleController
 
+- (void)dealloc
+{
+	_clippingView.scrollView.delegate = nil;
+}
+
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
