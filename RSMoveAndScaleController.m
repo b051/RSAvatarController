@@ -7,10 +7,10 @@
 #import "RSMoveAndScaleController.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface RSMoveAndScaleView ()
+@interface RSMoveAndScaleView () <UIScrollViewDelegate>
 
-@property (nonatomic, weak) UIScrollView *scrollView;
-@property (nonatomic, weak) UIImageView *imageView;
+@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UIImageView *imageView;
 
 @end
 
@@ -45,6 +45,7 @@
 		scrollView.scrollEnabled = YES;
 		scrollView.alwaysBounceHorizontal = YES;
 		scrollView.alwaysBounceVertical = YES;
+		scrollView.delegate = self;
 		[self addSubview:_scrollView = scrollView];
 		
 		UIImageView *imageView = [[UIImageView alloc] init];
@@ -102,7 +103,7 @@
 	CGPoint offset = _scrollView.contentOffset;
 	CGSize size = _scrollView.contentSize;
 	CGFloat scale = (1 - 1 / _scrollView.zoomScale);
-//	NSLog(@"scale %f offset:%@", scale, NSStringFromCGPoint(offset));
+	//	NSLog(@"scale %f offset:%@", scale, NSStringFromCGPoint(offset));
 	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * scale, threshold.y + size.height * scale);
 	
 	offset.y = MAX(MIN(offset.y, t.y), -threshold.y);
@@ -130,7 +131,7 @@
 		CGFloat width = self.bounds.size.width;
 		CGFloat height = width / image.size.width  * image.size.height;
 		CGSize size = CGSizeMake(width, height);
-		_imageView.frame = (CGRect){.size = size};
+		self.imageView.frame = (CGRect){.size = size};
 		[self adjustView];
 	}
 }
@@ -149,15 +150,21 @@
 	return snapshot;
 }
 
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+	[self limitScrollViewInBounds];
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+	return self.imageView;
+}
+
 @end
 
 
 @implementation RSMoveAndScaleController
-
-- (void)dealloc
-{
-	_clippingView.scrollView.delegate = nil;
-}
 
 - (void)viewDidLoad
 {
@@ -178,7 +185,6 @@
 	}
 	[self.view addSubview:self.overlayView];
 	RSMoveAndScaleView *clippingView = [[RSMoveAndScaleView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height - bottomHeight)];
-	clippingView.scrollView.delegate = self;
 	clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	clippingView.clipsToBounds = YES;
 	if (_maximumZoomScale) clippingView.maximumZoomScale = _maximumZoomScale;
@@ -190,18 +196,6 @@
 	[super viewWillAppear:animated];
 	_clippingView.destinationSize = _destinationSize;
 	_clippingView.image = _originImage;
-}
-
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-	[_clippingView limitScrollViewInBounds];
-}
-
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
-{
-	if (scrollView == _clippingView.scrollView)
-		return _clippingView.imageView;
-	return nil;
 }
 
 - (void)setMaximumZoomScale:(CGFloat)maximumZoomScale
@@ -225,7 +219,7 @@
 
 - (void)choose
 {
-	UIImage *snapshot = [_clippingView croppingImage];
+	UIImage *snapshot = [self.clippingView croppingImage];
 	[self.delegate moveAndScaleController:self didFinishCropping:snapshot];
 }
 
