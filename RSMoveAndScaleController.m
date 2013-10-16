@@ -54,6 +54,11 @@
 	return self;
 }
 
+- (void)dealloc
+{
+	_scrollView.delegate = nil;
+}
+
 - (void)setMaximumZoomScale:(CGFloat)maximumZoomScale
 {
 	_maximumZoomScale = maximumZoomScale;
@@ -157,7 +162,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	self.contentSizeForViewInPopover = CGSizeMake(320, 443);
+	self.preferredContentSize = CGSizeMake(320, 443);
 	CGRect frame = self.overlayView.frame;
 	CGSize size = self.view.bounds.size;
 	CGFloat bottomHeight = 96;
