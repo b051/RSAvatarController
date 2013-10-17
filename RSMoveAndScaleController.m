@@ -169,7 +169,12 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-	self.preferredContentSize = CGSizeMake(320, 443);
+	if ([self respondsToSelector:@selector(preferredContentSize)]) {
+		self.preferredContentSize = CGSizeMake(320, 443);
+	} else {
+		self.contentSizeForViewInPopover = CGSizeMake(320, 443);
+	}
+	
 	CGRect frame = self.overlayView.frame;
 	CGSize size = self.view.bounds.size;
 	CGFloat bottomHeight = 96;
