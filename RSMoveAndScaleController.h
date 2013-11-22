@@ -29,6 +29,7 @@
 
 @property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
 @property (nonatomic) CGSize destinationSize;
+@property (nonatomic, assign) BOOL showClipingViewBorder;
 
 @end
 

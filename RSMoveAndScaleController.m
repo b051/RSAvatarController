@@ -11,6 +11,7 @@
 
 @property (nonatomic, weak) UIScrollView *scrollView;
 @property (nonatomic, weak) UIImageView *imageView;
+@property (nonatomic, assign) BOOL showClipingViewBorder;
 
 @end
 
@@ -144,6 +145,22 @@
 	return snapshot;
 }
 
+- (void)setShowClipingViewBorder:(BOOL)showClipingViewBorder
+{
+	_showClipingViewBorder = showClipingViewBorder;
+	if (showClipingViewBorder) {
+		UIBezierPath *path = [UIBezierPath bezierPathWithRect:scrollLayer.frame];
+		CAShapeLayer *clipingBorder = [CAShapeLayer layer];
+		clipingBorder.contentsScale = [UIScreen mainScreen].scale;
+		clipingBorder.frame = self.bounds;
+		clipingBorder.lineWidth = 1;
+		clipingBorder.strokeColor = [UIColor whiteColor].CGColor;
+		clipingBorder.fillColor = [UIColor clearColor].CGColor;
+		clipingBorder.path = path.CGPath;
+		[self.layer addSublayer:clipingBorder];
+	}
+}
+
 @end
 
 
@@ -180,6 +197,12 @@
 	[super viewWillAppear:animated];
 	_clippingView.destinationSize = _destinationSize;
 	_clippingView.image = _originImage;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+	[super viewDidAppear:animated];
+	_clippingView.showClipingViewBorder = self.showClipingViewBorder;
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
