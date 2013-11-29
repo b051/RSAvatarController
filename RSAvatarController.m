@@ -114,12 +114,14 @@
 - (void)moveAndScaleController:(RSMoveAndScaleController *)moveAndScale didFinishCropping:(UIImage *)destImage
 {
 	[self.delegate pickerController:_imagePicker pickedAvatar:destImage];
-	[self imagePickerControllerDidCancel:_imagePicker];
+	[self.imagePicker popToRootViewControllerAnimated:NO];
+	[self imagePickerControllerDidCancel:self.imagePicker];
 }
 
 - (void)moveAndScaleControllerDidCancel:(RSMoveAndScaleController *)moveAndScale
 {
-	[self imagePickerControllerDidCancel:_imagePicker];
+	[self.imagePicker popToRootViewControllerAnimated:NO];
+	[self imagePickerControllerDidCancel:self.imagePicker];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
