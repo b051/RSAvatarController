@@ -172,7 +172,12 @@
 	if ([self respondsToSelector:@selector(preferredContentSize)]) {
 		self.preferredContentSize = CGSizeMake(320, 443);
 	} else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
+		
 		self.contentSizeForViewInPopover = CGSizeMake(320, 443);
+		
+#pragma clang diagnostic pop
 	}
 	
 	CGRect frame = self.overlayView.frame;
