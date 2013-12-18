@@ -17,6 +17,7 @@
 @implementation RSMoveAndScaleView
 {
 	CALayer *scrollLayer;
+	CAShapeLayer *clippingBorder;
 	CGPoint threshold;
 	CGFloat minimumScale;
 }
@@ -51,6 +52,12 @@
 		UIImageView *imageView = [[UIImageView alloc] init];
 		imageView.contentMode = UIViewContentModeScaleAspectFill;
 		[scrollView addSubview:_imageView = imageView];
+		
+		clippingBorder = [CAShapeLayer layer];
+		clippingBorder.lineWidth = 1;
+		clippingBorder.strokeColor = [UIColor whiteColor].CGColor;
+		clippingBorder.fillColor = [UIColor clearColor].CGColor;
+		[self.layer addSublayer:clippingBorder];
 	}
 	return self;
 }
@@ -73,15 +80,29 @@
 	self.layer.mask.backgroundColor = (maskForegroundColor ?: [UIColor blackColor]).CGColor;
 }
 
-- (void)adjustView
+- (void)setMaskBorderColor:(UIColor *)maskBorderColor
 {
+	_maskBorderColor = maskBorderColor;
+	clippingBorder.strokeColor = (maskBorderColor ?: [UIColor whiteColor]).CGColor;
+}
+
+- (void)layoutSubviews
+{
+	[super layoutSubviews];
+
 	CGSize size = self.bounds.size;
-	CGFloat x = (size.width - _destinationSize.width) / 2;
-	CGFloat y = x * 1.5;
-	scrollLayer.frame = UIEdgeInsetsInsetRect(CGRectMake(x, y, _destinationSize.width, _destinationSize.height), self.scrollingViewEdgeInsets);
-	size = _imageView.frame.size;
-	threshold = CGPointMake((size.width - self.destinationSize.width) / 2, (size.height - self.destinationSize.height) / 2);
-	_imageView.frame = (CGRect){.size = size, .origin.y = scrollLayer.frame.origin.y - threshold.y};
+	CGSize dest = self.destinationSize;
+	CGFloat x = roundf((size.width - dest.width) / 2);
+	CGFloat y = roundf((size.height - dest.height) / 2);
+	scrollLayer.frame = UIEdgeInsetsInsetRect(CGRectMake(x, y, dest.width, dest.height), self.scrollingViewEdgeInsets);
+
+	clippingBorder.frame = self.bounds;
+	clippingBorder.path = [UIBezierPath bezierPathWithRect:scrollLayer.frame].CGPath;
+
+	size = self.imageView.frame.size;
+	threshold = CGPointMake((size.width - dest.width) / 2, (size.height - dest.height) / 2);
+	self.imageView.frame = (CGRect){.size = size, .origin.y = scrollLayer.frame.origin.y - threshold.y};
+
 	if (size.width > 0 && size.height > 0) {
 		CGFloat height = scrollLayer.bounds.size.height, width = scrollLayer.bounds.size.width;
 		CGFloat frameRatio = width / height;
@@ -115,13 +136,13 @@
 - (void)setDestinationSize:(CGSize)destinationSize
 {
 	_destinationSize = destinationSize;
-	[self adjustView];
+	[self setNeedsLayout];
 }
 
 - (void)setScrollingViewEdgeInsets:(UIEdgeInsets)scrollingViewEdgeInsets
 {
 	_scrollingViewEdgeInsets = scrollingViewEdgeInsets;
-	[self adjustView];
+	[self setNeedsLayout];
 }
 
 - (void)setImage:(UIImage *)image
@@ -132,7 +153,8 @@
 		CGFloat height = width / image.size.width  * image.size.height;
 		CGSize size = CGSizeMake(width, height);
 		self.imageView.frame = (CGRect){.size = size};
-		[self adjustView];
+
+		[self setNeedsLayout];
 	}
 }
 
@@ -149,7 +171,6 @@
 	UIGraphicsEndImageContext();
 	return snapshot;
 }
-
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
@@ -169,6 +190,12 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
+
+	if ([self respondsToSelector:@selector(edgesForExtendedLayout)]) {
+		self.automaticallyAdjustsScrollViewInsets = NO;
+		self.edgesForExtendedLayout = UIRectEdgeNone;
+	}
+	
 	if ([self respondsToSelector:@selector(preferredContentSize)]) {
 		self.preferredContentSize = CGSizeMake(320, 443);
 	} else {
@@ -194,6 +221,7 @@
 		self.overlayView.frame = self.view.bounds;
 	}
 	[self.view addSubview:self.overlayView];
+	
 	RSMoveAndScaleView *clippingView = [[RSMoveAndScaleView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height - bottomHeight)];
 	clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	clippingView.clipsToBounds = YES;

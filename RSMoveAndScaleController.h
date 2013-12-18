@@ -13,6 +13,7 @@
 @property (nonatomic) UIEdgeInsets scrollingViewEdgeInsets UI_APPEARANCE_SELECTOR;
 @property (nonatomic) CGFloat maximumZoomScale UI_APPEARANCE_SELECTOR;
 @property (nonatomic, strong) UIColor *maskForegroundColor UI_APPEARANCE_SELECTOR;
+@property (nonatomic, strong) UIColor *maskBorderColor UI_APPEARANCE_SELECTOR;
 
 @end
 
