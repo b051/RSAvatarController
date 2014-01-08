@@ -16,6 +16,7 @@
 
 @implementation RSMoveAndScaleView
 {
+	CALayer *mask;
 	CALayer *scrollLayer;
 	CAShapeLayer *clippingBorder;
 	CGPoint threshold;
@@ -28,7 +29,7 @@
 		_maximumZoomScale = 3.0;
 		_destinationSize = CGSizeMake(320, 320);
 		
-		CALayer *mask = [CALayer layer];
+		mask = [CALayer layer];
 		mask.frame = frame;
 		mask.backgroundColor = (self.maskForegroundColor ?: [UIColor blackColor]).CGColor;
 		scrollLayer = [CALayer layer];
@@ -37,6 +38,7 @@
 		self.layer.mask = mask;
 		
 		UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+		scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		scrollView.showsVerticalScrollIndicator = NO;
 		scrollView.showsHorizontalScrollIndicator = NO;
 		scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -89,6 +91,8 @@
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
+
+	mask.frame = self.bounds;
 
 	CGSize size = self.bounds.size;
 	CGSize dest = self.destinationSize;
