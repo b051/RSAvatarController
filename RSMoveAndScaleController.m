@@ -236,6 +236,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
+	if (self.navigationController.navigationBarHidden) {
+		self.navigationController.navigationBarHidden = NO;
+	}
 	_clippingView.destinationSize = _destinationSize;
 	_clippingView.image = _originImage;
 }
