@@ -130,19 +130,19 @@
 	CGFloat scale = (1 - 1 / _scrollView.zoomScale);
 	//	NSLog(@"scale %f offset:%@", scale, NSStringFromCGPoint(offset));
 	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * scale, threshold.y + size.height * scale);
-	
-	offset.y = MAX(MIN(offset.y, t.y), -threshold.y);
-	offset.x = MAX(MIN(offset.x, t.x), -threshold.x);
-    
-    //center items if they are smaller than destination size
-    if (self.destinationSize.width > size.width) {
-        offset.x -= roundf((self.destinationSize.width - size.width)/2);;
-    }
-    
-    if (self.destinationSize.height > size.height) {
-        offset.y -= roundf((self.destinationSize.height - size.height)/2);;
-    }
-    
+
+	offset.y = MAX(MIN(offset.y, t.y), - threshold.y);
+	offset.x = MAX(MIN(offset.x, t.x), - threshold.x);
+
+	//center items if they are smaller than destination size
+	if (self.destinationSize.width > size.width) {
+		offset.x -= roundf((self.destinationSize.width - size.width) / 2);
+	}
+
+	if (self.destinationSize.height > size.height) {
+		offset.y -= roundf((self.destinationSize.height - size.height) / 2);
+	}
+
 	_scrollView.contentOffset = offset;
 	_scrollView.contentInset = UIEdgeInsetsMake(-offset.y, -offset.x, 0, 0);
 }
