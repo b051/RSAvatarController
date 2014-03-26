@@ -131,8 +131,8 @@
 	//	NSLog(@"scale %f offset:%@", scale, NSStringFromCGPoint(offset));
 	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * scale, threshold.y + size.height * scale);
 
-	offset.y = MAX(MIN(offset.y, t.y), - threshold.y);
-	offset.x = MAX(MIN(offset.x, t.x), - threshold.x);
+	offset.y = MAX(MIN(offset.y, t.y), -threshold.y);
+	offset.x = MAX(MIN(offset.x, t.x), -threshold.x);
 
 	//center items if they are smaller than destination size
 	if (self.destinationSize.width > size.width) {
