@@ -7,14 +7,17 @@
 //
 
 #import "RSAppDelegate.h"
+#import "DemoViewController.h"
 
 @implementation RSAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
+
+  // Override point for customization after application launch.
+  self.window.rootViewController = [[DemoViewController alloc] init];
+  
     [self.window makeKeyAndVisible];
     return YES;
 }

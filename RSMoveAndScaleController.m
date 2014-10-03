@@ -231,6 +231,9 @@
 	clippingView.clipsToBounds = YES;
 	if (_maximumZoomScale) clippingView.maximumZoomScale = _maximumZoomScale;
 	[self.view addSubview:_clippingView = clippingView];
+  
+  // ensure the overlay is over the image
+  [self.view bringSubviewToFront:self.overlayView];
 }
 
 - (void)viewWillAppear:(BOOL)animated
