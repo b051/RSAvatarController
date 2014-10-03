@@ -100,41 +100,7 @@
 	}
 }
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
-{
-	UIImage *originImage = [info objectForKey:UIImagePickerControllerOriginalImage];
-	RSMoveAndScaleController *moveAndScale = [[RSMoveAndScaleController alloc] init];
-	moveAndScale.originImage = originImage;
-	moveAndScale.destinationSize = [self.delegate destinationImageSizeForAvatarController:self];
-	moveAndScale.overlayView = [self.delegate avatarController:self overlayForMoveAndScale:moveAndScale];
-	moveAndScale.delegate = self;
-	[picker pushViewController:moveAndScale animated:NO];
-}
-
-- (void)moveAndScaleController:(RSMoveAndScaleController *)moveAndScale didFinishCropping:(UIImage *)destImage
-{
-	[self.delegate avatarController:self pickedAvatar:destImage];
-	[self.imagePicker popToRootViewControllerAnimated:NO];
-	[self imagePickerControllerDidCancel:self.imagePicker];
-}
-
-- (void)moveAndScaleControllerDidCancel:(RSMoveAndScaleController *)moveAndScale
-{
-	[self.imagePicker popToRootViewControllerAnimated:NO];
-	[self imagePickerControllerDidCancel:self.imagePicker];
-}
-
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
-{
-	if (popover) {
-		[popover dismissPopoverAnimated:YES];
-		popover = nil;
-	} else {
-		[picker.presentingViewController dismissViewControllerAnimated:YES completion:^{
-			_imagePicker = nil;
-		}];
-	}
-}
+#pragma mark UIPopoverControllerDelegate
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
 {
@@ -142,7 +108,48 @@
 	_imagePicker = nil;
 }
 
+#pragma mark UIImagePickerControllerDelegate
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+  UIImage *originImage = [info objectForKey:UIImagePickerControllerOriginalImage];
+  RSMoveAndScaleController *moveAndScale = [[RSMoveAndScaleController alloc] init];
+  moveAndScale.originImage = originImage;
+  moveAndScale.destinationSize = [self.delegate destinationImageSizeForAvatarController:self];
+  moveAndScale.overlayView = [self.delegate avatarController:self overlayForMoveAndScale:moveAndScale];
+  moveAndScale.delegate = self;
+  [picker pushViewController:moveAndScale animated:NO];
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+  if (popover) {
+    [popover dismissPopoverAnimated:YES];
+    popover = nil;
+  } else {
+    [picker.presentingViewController dismissViewControllerAnimated:YES completion:^{
+      _imagePicker = nil;
+    }];
+  }
+}
+
+#pragma mark RSMoveAndScaleControllerDelegate
+
+- (void)moveAndScaleController:(RSMoveAndScaleController *)moveAndScale didFinishCropping:(UIImage *)destImage
+{
+  [self.delegate avatarController:self pickedAvatar:destImage];
+  [self.imagePicker popToRootViewControllerAnimated:NO];
+  [self imagePickerControllerDidCancel:self.imagePicker];
+}
+
+- (void)moveAndScaleControllerDidCancel:(RSMoveAndScaleController *)moveAndScale
+{
+  [self.imagePicker popToRootViewControllerAnimated:NO];
+  [self imagePickerControllerDidCancel:self.imagePicker];
+}
+
 #pragma mark - UINavigationControllerDelegate
+
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
 	if ([self.delegate respondsToSelector:@selector(navigationController:didShowViewController:animated:)])
