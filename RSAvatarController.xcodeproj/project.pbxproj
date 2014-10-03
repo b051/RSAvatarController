@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5E5614AE19DEFF9800D88C74 /* DemoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5E5614AD19DEFF9800D88C74 /* DemoViewController.m */; };
 		CF2886B9177AB26300B43887 /* RSAvatarController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF2886B8177AB26300B43887 /* RSAvatarController.m */; };
 		CF2886BF177AB34A00B43887 /* RSMoveAndScaleController.m in Sources */ = {isa = PBXBuildFile; fileRef = CF2886BE177AB34A00B43887 /* RSMoveAndScaleController.m */; };
 		CF7B83AD17B8E34D00913E5B /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CF7B83AC17B8E34D00913E5B /* QuartzCore.framework */; };
@@ -22,6 +23,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5E5614AC19DEFF9800D88C74 /* DemoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoViewController.h; sourceTree = "<group>"; };
+		5E5614AD19DEFF9800D88C74 /* DemoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DemoViewController.m; sourceTree = "<group>"; };
 		CF2886B7177AB26300B43887 /* RSAvatarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSAvatarController.h; sourceTree = "<group>"; };
 		CF2886B8177AB26300B43887 /* RSAvatarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSAvatarController.m; sourceTree = "<group>"; };
 		CF2886BD177AB34A00B43887 /* RSMoveAndScaleController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSMoveAndScaleController.h; sourceTree = "<group>"; };
@@ -103,6 +106,8 @@
 				CFA94345177AB13E005782D7 /* RSAppDelegate.h */,
 				CFA94346177AB13E005782D7 /* RSAppDelegate.m */,
 				CFA9433D177AB13E005782D7 /* Supporting Files */,
+				5E5614AC19DEFF9800D88C74 /* DemoViewController.h */,
+				5E5614AD19DEFF9800D88C74 /* DemoViewController.m */,
 			);
 			path = RSAvatarController;
 			sourceTree = "<group>";
@@ -190,6 +195,7 @@
 				CFA94343177AB13E005782D7 /* main.m in Sources */,
 				CF2886BF177AB34A00B43887 /* RSMoveAndScaleController.m in Sources */,
 				CF2886B9177AB26300B43887 /* RSAvatarController.m in Sources */,
+				5E5614AE19DEFF9800D88C74 /* DemoViewController.m in Sources */,
 				CFA94347177AB13E005782D7 /* RSAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
