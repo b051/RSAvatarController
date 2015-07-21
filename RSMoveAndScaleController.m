@@ -11,7 +11,7 @@
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIImageView *imageView;
-
+@property (nonatomic) UIViewContentMode minimumContentMode;
 @end
 
 @implementation RSMoveAndScaleView
@@ -91,43 +91,45 @@
 - (void)layoutSubviews
 {
 	[super layoutSubviews];
-
+	
 	mask.frame = self.bounds;
-
-	CGSize size = self.bounds.size;
+	
 	CGSize dest = self.destinationSize;
-	CGFloat x = roundf((size.width - dest.width) / 2);
-	CGFloat y = roundf((size.height - dest.height) / 2);
-	scrollLayer.frame = UIEdgeInsetsInsetRect(CGRectMake(x, y, dest.width, dest.height), self.scrollingViewEdgeInsets);
-
+	CGFloat x = roundf((self.bounds.size.width - dest.width) / 2);
+	CGFloat y = roundf((self.bounds.size.height - dest.height) / 2);
+	CGRect calculated = UIEdgeInsetsInsetRect(CGRectMake(x, y, dest.width, dest.height), self.scrollingViewEdgeInsets);
+	scrollLayer.frame = calculated;
+	
 	clippingBorder.frame = self.bounds;
-	clippingBorder.path = [UIBezierPath bezierPathWithRect:scrollLayer.frame].CGPath;
-
-	size = self.imageView.frame.size;
-	threshold = CGPointMake((size.width - dest.width) / 2, (size.height - dest.height) / 2);
-	self.imageView.frame = (CGRect){.size = size, .origin.y = scrollLayer.frame.origin.y - threshold.y};
-
+	clippingBorder.path = [UIBezierPath bezierPathWithRect:calculated].CGPath;
+	
+	CGSize size = self.imageView.frame.size;
+	
 	if (size.width > 0 && size.height > 0) {
-		CGFloat height = scrollLayer.bounds.size.height, width = scrollLayer.bounds.size.width;
-		CGFloat frameRatio = width / height;
-		CGFloat imageRatio = size.width / size.height;
-		// fit
-		if (imageRatio < frameRatio) {
-			width = height * imageRatio;
+		CGFloat height = calculated.size.height, width = calculated.size.width;
+		CGFloat widthRatio = width / size.width;
+		CGFloat heightRatio = height / size.height;
+		if (self.minimumContentMode == UIViewContentModeScaleAspectFit) {
+			minimumScale = MIN(heightRatio, widthRatio);
+		} else {
+			minimumScale = MAX(heightRatio, widthRatio);
 		}
-		minimumScale = width / size.width;
-		
+		size = CGSizeMake(minimumScale * size.width, minimumScale * size.height);
 		_scrollView.minimumZoomScale = minimumScale;
-		_scrollView.maximumZoomScale = MAX(minimumScale * 1.5, _scrollView.maximumZoomScale);
+		_scrollView.maximumZoomScale = minimumScale * 1.5;
 		_scrollView.contentSize = size;
 	}
+	
+	threshold = CGPointMake((size.width - dest.width) / 2, (size.height - dest.height) / 2);
+	self.imageView.bounds = (CGRect){.size = size };
+	self.imageView.center = self.center;
 }
 
 - (void)limitScrollViewInBounds
 {
 	CGPoint offset = _scrollView.contentOffset;
 	CGSize size = _scrollView.contentSize;
-	CGFloat scale = (1 - 1 / _scrollView.zoomScale);
+	CGFloat scale = 1 - 1 / _scrollView.zoomScale;
 	//	NSLog(@"scale %f offset:%@", scale, NSStringFromCGPoint(offset));
 	CGPoint t = scale == 1 ? threshold : CGPointMake(threshold.x + size.width * scale, threshold.y + size.height * scale);
 	
@@ -157,7 +159,6 @@
 		CGFloat height = width / image.size.width  * image.size.height;
 		CGSize size = CGSizeMake(width, height);
 		self.imageView.frame = (CGRect){.size = size};
-
 		[self setNeedsLayout];
 	}
 }
@@ -194,7 +195,7 @@
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
-
+	
 	if ([self respondsToSelector:@selector(edgesForExtendedLayout)]) {
 		self.automaticallyAdjustsScrollViewInsets = NO;
 		self.edgesForExtendedLayout = UIRectEdgeNone;
@@ -210,11 +211,10 @@
 		
 #pragma clang diagnostic pop
 	}
-	
-	CGRect frame = self.overlayView.frame;
 	CGSize size = self.view.bounds.size;
+	CGRect frame = self.overlayView.frame;
 	CGFloat bottomHeight = 96;
-	if (frame.size.height < size.height) {
+	if (frame.size.height > 0 && frame.size.height < size.height) {
 		NSUInteger mask = self.overlayView.autoresizingMask;
 		if ((mask | UIViewAutoresizingFlexibleTopMargin) == mask) {
 			frame.origin.y = size.height - frame.size.height;
@@ -228,6 +228,7 @@
 	
 	RSMoveAndScaleView *clippingView = [[RSMoveAndScaleView alloc] initWithFrame:CGRectMake(0, 0, size.width, size.height - bottomHeight)];
 	clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+	clippingView.minimumContentMode = self.minimumContentMode;
 	clippingView.clipsToBounds = YES;
 	if (_maximumZoomScale) clippingView.maximumZoomScale = _maximumZoomScale;
 	[self.view addSubview:_clippingView = clippingView];
@@ -244,6 +245,12 @@
 {
 	_maximumZoomScale = maximumZoomScale;
 	_clippingView.maximumZoomScale = maximumZoomScale;
+}
+
+- (void)setMinimumContentMode:(UIViewContentMode)minimumContentMode
+{
+	_minimumContentMode = minimumContentMode;
+	_clippingView.minimumContentMode = minimumContentMode;
 }
 
 - (void)setDestinationSize:(CGSize)destinationSize

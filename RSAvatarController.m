@@ -33,9 +33,9 @@
 {
 	parentController = viewController;
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Select from Gallery", nil];
+		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take photo", @"Choose existing photo", nil];
 	} else {
-		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Select from Gallery", nil];
+		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose existing photo", nil];
 	}
 	_actionSheet.actionSheetStyle = sheetStyle;
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -107,6 +107,9 @@
 	moveAndScale.originImage = originImage;
 	moveAndScale.destinationSize = [self.delegate destinationImageSizeForAvatarController:self];
 	moveAndScale.overlayView = [self.delegate avatarController:self overlayForMoveAndScale:moveAndScale];
+	if ([self.delegate respondsToSelector:@selector(contentModeForAvatarController:)]) {
+		moveAndScale.minimumContentMode = [self.delegate contentModeForAvatarController:self];
+	}
 	moveAndScale.delegate = self;
 	[picker pushViewController:moveAndScale animated:NO];
 }
@@ -120,12 +123,18 @@
 
 - (void)moveAndScaleControllerDidCancel:(RSMoveAndScaleController *)moveAndScale
 {
+	if ([self.delegate respondsToSelector:@selector(avatarControllerDidCancel:)]) {
+		[self.delegate avatarControllerDidCancel:self];
+	}
 	[self.imagePicker popToRootViewControllerAnimated:NO];
 	[self imagePickerControllerDidCancel:self.imagePicker];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
+	if ([self.delegate respondsToSelector:@selector(avatarControllerDidCancel:)]) {
+		[self.delegate avatarControllerDidCancel:self];
+	}
 	if (popover) {
 		[popover dismissPopoverAnimated:YES];
 		popover = nil;

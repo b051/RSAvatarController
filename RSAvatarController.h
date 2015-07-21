@@ -4,6 +4,8 @@
 //  Created by Rex Sheng on 7/6/12.
 //
 
+#import <UIKit/UIKit.h>
+
 @protocol RSMoveAndScaleTrait <NSObject>
 - (void)cancel;
 - (void)choose;
@@ -28,8 +30,9 @@
 - (UIView *)avatarController:(RSAvatarController *)controller overlayForMoveAndScale:(id<RSMoveAndScaleTrait>)trait;
 - (CGRect)popoverRectForAvatarController:(RSAvatarController *)controller;
 - (CGSize)destinationImageSizeForAvatarController:(RSAvatarController *)controller;
-
 @optional
+- (void)avatarControllerDidCancel:(RSAvatarController *)controller;
 - (UIView *)overlayForAvatarControllerImagePicker:(RSAvatarController *)controller;
+- (UIViewContentMode)contentModeForAvatarController:(RSAvatarController *)controller;
 
 @end
