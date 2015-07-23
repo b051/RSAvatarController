@@ -29,7 +29,7 @@
 @property (nonatomic) UIViewContentMode minimumContentMode; // you can only set it to UIViewContentModeScaleAspectFit or UIViewContentModeScaleAspectFill. Default to UIViewContentModeScaleAspectFit
 
 @property (nonatomic, weak) id<RSMoveAndScaleControllerDelegate> delegate;
-@property (nonatomic) CGSize destinationSize;
+@property (nonatomic) CGSize destinationSize, uploadSize;
 
 @end
 

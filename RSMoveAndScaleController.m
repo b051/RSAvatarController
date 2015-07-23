@@ -41,7 +41,6 @@
 		scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		scrollView.showsVerticalScrollIndicator = NO;
 		scrollView.showsHorizontalScrollIndicator = NO;
-		scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 		scrollView.zoomScale = 1.0;
 		scrollView.clipsToBounds = NO;
 		scrollView.maximumZoomScale = _maximumZoomScale;
@@ -163,14 +162,15 @@
 	}
 }
 
-- (UIImage *)croppingImage
+- (UIImage *)croppingImage:(CGSize)size
 {
-	CGRect scrollFrame = scrollLayer.frame;
+	CGRect calculated = scrollLayer.frame;
 	CALayer *layer = _scrollView.layer;
-	UIGraphicsBeginImageContextWithOptions(self.destinationSize, NO, [UIScreen mainScreen].scale);
+	UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
 	CGContextRef ctx = UIGraphicsGetCurrentContext();
 	CGPoint vorigin = layer.visibleRect.origin;
-	CGContextTranslateCTM(ctx, -vorigin.x - scrollFrame.origin.x, -vorigin.y - scrollFrame.origin.y);
+	CGContextScaleCTM(ctx, size.width / calculated.size.width, size.height / calculated.size.height);
+	CGContextTranslateCTM(ctx, -vorigin.x - calculated.origin.x, -vorigin.y - calculated.origin.y);
 	[layer renderInContext:ctx];
 	UIImage *snapshot = UIGraphicsGetImageFromCurrentImageContext();
 	UIGraphicsEndImageContext();
@@ -268,7 +268,7 @@
 
 - (void)choose
 {
-	UIImage *snapshot = [self.clippingView croppingImage];
+	UIImage *snapshot = [self.clippingView croppingImage:self.uploadSize];
 	[self.delegate moveAndScaleController:self didFinishCropping:snapshot];
 }
 

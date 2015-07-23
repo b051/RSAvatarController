@@ -106,6 +106,11 @@
 	RSMoveAndScaleController *moveAndScale = [[RSMoveAndScaleController alloc] init];
 	moveAndScale.originImage = originImage;
 	moveAndScale.destinationSize = [self.delegate destinationImageSizeForAvatarController:self];
+	if ([self.delegate respondsToSelector:@selector(destinationImageUploadSizeForAvatarController:)]) {
+		moveAndScale.uploadSize = [self.delegate destinationImageUploadSizeForAvatarController:self];
+	} else {
+		moveAndScale.uploadSize = moveAndScale.destinationSize;
+	}
 	moveAndScale.overlayView = [self.delegate avatarController:self overlayForMoveAndScale:moveAndScale];
 	if ([self.delegate respondsToSelector:@selector(contentModeForAvatarController:)]) {
 		moveAndScale.minimumContentMode = [self.delegate contentModeForAvatarController:self];

@@ -31,6 +31,7 @@
 - (CGRect)popoverRectForAvatarController:(RSAvatarController *)controller;
 - (CGSize)destinationImageSizeForAvatarController:(RSAvatarController *)controller;
 @optional
+- (CGSize)destinationImageUploadSizeForAvatarController:(RSAvatarController *)controller;
 - (void)avatarControllerDidCancel:(RSAvatarController *)controller;
 - (UIView *)overlayForAvatarControllerImagePicker:(RSAvatarController *)controller;
 - (UIViewContentMode)contentModeForAvatarController:(RSAvatarController *)controller;
