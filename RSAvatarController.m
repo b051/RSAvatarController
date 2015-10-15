@@ -9,14 +9,14 @@
 #import "RSMoveAndScaleController.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface RSAvatarController () <UIActionSheetDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, RSMoveAndScaleControllerDelegate, UIPopoverControllerDelegate>
+@interface RSAvatarController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, RSMoveAndScaleControllerDelegate, UIPopoverControllerDelegate>
 @end
 
 @implementation RSAvatarController
 {
 	UIPopoverController *popover;
 	__weak UIViewController *parentController;
-	UIActionSheet *_actionSheet;
+	UIAlertController *_actionSheet;
 }
 
 - (BOOL)takingAvatar
@@ -26,48 +26,41 @@
 
 - (void)openActionSheetInController:(UIViewController *)viewController
 {
-	[self openActionSheetInController:viewController withSheetStyle:UIActionSheetStyleDefault];
-}
-
-- (void)openActionSheetInController:(UIViewController *)viewController withSheetStyle:(UIActionSheetStyle)sheetStyle
-{
 	parentController = viewController;
+	_actionSheet = [UIAlertController alertControllerWithTitle:@"Pick photo" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+	[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take photo", @"Choose existing photo", nil];
-	} else {
-		_actionSheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose existing photo", nil];
+		[UIAlertAction actionWithTitle:@"Take photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+			[self startPickingImage:true];
+		}];
 	}
-	_actionSheet.actionSheetStyle = sheetStyle;
-	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-		[_actionSheet showFromRect:[self.delegate popoverRectForAvatarController:self] inView:viewController.view animated:YES];
-	} else {
-		[_actionSheet showInView:viewController.view];
-	}
+	[UIAlertAction actionWithTitle:@"Choose existing photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+		[self startPickingImage:false];
+	}];
+	
+	_actionSheet.modalPresentationStyle = UIModalPresentationPopover;
+	_actionSheet.popoverPresentationController.sourceView = viewController.view;
+	CGRect v = [self.delegate popoverRectForAvatarController:self];
+	_actionSheet.popoverPresentationController.sourceRect = v;
+	[viewController presentViewController:_actionSheet animated:true completion:nil];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)startPickingImage:(BOOL)fromCamera
 {
-	if (actionSheet.cancelButtonIndex == buttonIndex) {
-		_imagePicker = nil;
-		return;
-	}
 	_imagePicker = [[UIImagePickerController alloc] init];
 	_imagePicker.delegate = self;
-	
-	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-		if (actionSheet.firstOtherButtonIndex == buttonIndex) {
-			_imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
-			UIView *overlay = nil;
-			if ([self.delegate respondsToSelector:@selector(overlayForAvatarControllerImagePicker:)]) {
-				overlay = [self.delegate overlayForAvatarControllerImagePicker:self];
-			}
-			if (overlay) {
-				_imagePicker.showsCameraControls = NO;
-				_imagePicker.cameraOverlayView = overlay;
-			}
+	if (fromCamera) {
+		_imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+		UIView *overlay = nil;
+		if ([self.delegate respondsToSelector:@selector(overlayForAvatarControllerImagePicker:)]) {
+			overlay = [self.delegate overlayForAvatarControllerImagePicker:self];
+		}
+		if (overlay) {
+			_imagePicker.showsCameraControls = NO;
+			_imagePicker.cameraOverlayView = overlay;
 		}
 	}
-	
 	if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
 		popover = [[UIPopoverController alloc] initWithContentViewController:_imagePicker];
 		popover.delegate = self;

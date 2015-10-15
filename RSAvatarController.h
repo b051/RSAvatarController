@@ -15,7 +15,6 @@
 
 @interface RSAvatarController : NSObject
 
-- (void)openActionSheetInController:(UIViewController *)viewController withSheetStyle:(UIActionSheetStyle)sheetStyle;
 - (void)openActionSheetInController:(UIViewController *)viewController;
 
 @property (nonatomic, readonly) BOOL takingAvatar;
