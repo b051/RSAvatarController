@@ -31,13 +31,16 @@
 	[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
 
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-		[UIAlertAction actionWithTitle:@"Take photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+		UIAlertAction *cameraAction = [UIAlertAction actionWithTitle:@"Take photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
 			[self startPickingImage:true];
 		}];
+		[_actionSheet addAction:cameraAction];
 	}
-	[UIAlertAction actionWithTitle:@"Choose existing photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+
+	UIAlertAction *existingAction = [UIAlertAction actionWithTitle:@"Choose existing photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
 		[self startPickingImage:false];
 	}];
+	[_actionSheet addAction:existingAction];
 	
 	_actionSheet.modalPresentationStyle = UIModalPresentationPopover;
 	_actionSheet.popoverPresentationController.sourceView = viewController.view;
