@@ -28,7 +28,7 @@
 {
 	parentController = viewController;
 	_actionSheet = [UIAlertController alertControllerWithTitle:@"Pick photo" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-	[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+	[_actionSheet addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
 
 	if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
 		UIAlertAction *cameraAction = [UIAlertAction actionWithTitle:@"Take photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
